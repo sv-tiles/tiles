@@ -1,0 +1,11 @@
+<scalastyle>
+	<check enabled="true" class="org.scalastyle.scalariform.MagicNumberChecker" level="warning">
+		<parameters>
+			<parameter name="ignore">-1,0,1,2,3</parameter>
+		</parameters>
+	</check>
+	<check enabled="true" class="org.scalastyle.scalariform.SpaceAfterCommentStartChecker" level="warning"/>
+	<check enabled="true" class="org.scalastyle.scalariform.VarFieldChecker" level="warning"/>
+	<check enabled="true" class="org.scalastyle.scalariform.VarLocalChecker" level="warning"/>
+	<check level="warning" class="org.scalastyle.file.NewLineAtEofChecker" enabled="true"/>
+</scalastyle>
