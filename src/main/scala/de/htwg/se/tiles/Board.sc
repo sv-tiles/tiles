@@ -11,18 +11,19 @@ object Terrain extends Enumeration {
 }
 
 object Tile {
-	val HEIGHT = 6
-	val WIDTH_HALF = 6
-	val BORDER = 2
-	val MARGIN = 2
 }
 
 case class Tile(x: Int, y: Int, north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain) {
-	def printLine(line: Int): String = line match {
-		case 0 => " " * Tile.MARGIN + north.symbol * Tile.WIDTH_HALF + " " * (Tile.MARGIN + Tile.BORDER)
-		case 1 | 2 | 3 => west.symbol * 2 + center.symbol * Tile.WIDTH_HALF + east.symbol * Tile.BORDER + " " * Tile.MARGIN
-		case 4 => " " * Tile.MARGIN + south.symbol * Tile.WIDTH_HALF + " " * (Tile.MARGIN + Tile.BORDER)
-		case 5 => " " * 2 * Tile.WIDTH_HALF
+	def printLine(line: Int, width: Int, height: Int, border: Int, margin: Int): String = {
+		if (line < border / 2) {
+			" " * border + north.symbol * (width - (2 * border)) + " " * (border + margin)
+		} else if (line >= height) {
+			" " * (width + margin)
+		} else if (line >= height - border / 2) {
+			" " * border + south.symbol * (width - (2 * border)) + " " * (border + margin)
+		} else {
+			west.symbol * border + center.symbol * (width - (2 * border)) + east.symbol * border + " " * margin
+		}
 	}
 
 	override def toString: String = center.symbol
@@ -31,10 +32,24 @@ case class Tile(x: Int, y: Int, north: Terrain, east: Terrain, south: Terrain, w
 case class Map(tiles: Array[Tile], width: Int, height: Int) {
 	require(width * height == tiles.length)
 
-	override def toString: String =
-		(for (y <- 0 until height; line <- 0 until Tile.HEIGHT) yield
-			(for (x <- 0 until width) yield tiles(y * width + x).printLine(line)).mkString + "\n"
+	override def toString: String = {
+		val tileHeight = 12
+		val tileWidth = 5
+		val border = 2
+		val margin = 2
+		toString(tileWidth, tileHeight, border, margin)
+	}
+
+	def toString(tileWidth: Int, tileHeight: Int, border: Int, margin: Int): String = {
+		require(border >= 2)
+		require(margin >= 0)
+		require(tileWidth - border >= 1)
+		require(tileHeight - border / 2 >= 1)
+
+		(for (y <- 0 until height; line <- 0 until tileHeight + margin / 2) yield
+			(for (x <- 0 until width) yield this.tiles(y * width + x).printLine(line, tileWidth, tileHeight, border, margin)).mkString + "\n"
 			).mkString
+	}
 }
 
 val tiles = Array(
@@ -53,3 +68,4 @@ val tiles = Array(
 
 val map = Map(tiles, 3, 3)
 
+map.toString(8, 3, 2, 2)
