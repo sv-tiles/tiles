@@ -1,71 +1,29 @@
-case class Terrain(symbol: String) {
-	override def toString: String = symbol
-}
-
-object Terrain extends Enumeration {
-	val Plains = Terrain("_")
-	val Hills = Terrain("^")
-	val Forest = Terrain("T")
-	val Mountains = Terrain("A")
-	val Water = Terrain("~")
-}
-
-object Tile {
-}
-
-case class Tile(x: Int, y: Int, north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain) {
-	def printLine(line: Int, width: Int, height: Int, border: Int, margin: Int): String = {
-		if (line < border / 2) {
-			" " * border + north.symbol * (width - (2 * border)) + " " * (border + margin)
-		} else if (line >= height) {
-			" " * (width + margin)
-		} else if (line >= height - border / 2) {
-			" " * border + south.symbol * (width - (2 * border)) + " " * (border + margin)
-		} else {
-			west.symbol * border + center.symbol * (width - (2 * border)) + east.symbol * border + " " * margin
-		}
-	}
-
-	override def toString: String = center.symbol
-}
-
-case class Map(tiles: Array[Tile], width: Int, height: Int) {
-	require(width * height == tiles.length)
-
-	override def toString: String = {
-		val tileHeight = 12
-		val tileWidth = 5
-		val border = 2
-		val margin = 2
-		toString(tileWidth, tileHeight, border, margin)
-	}
-
-	def toString(tileWidth: Int, tileHeight: Int, border: Int, margin: Int): String = {
-		require(border >= 2)
-		require(margin >= 0)
-		require(tileWidth - border >= 1)
-		require(tileHeight - border / 2 >= 1)
-
-		(for (y <- 0 until height; line <- 0 until tileHeight + margin / 2) yield
-			(for (x <- 0 until width) yield this.tiles(y * width + x).printLine(line, tileWidth, tileHeight, border, margin)).mkString + "\n"
-			).mkString
-	}
-}
+import de.htwg.se.tiles.{Map, Terrain, Tile}
 
 val tiles = Array(
-	Tile(0, 0, Terrain.Water, Terrain.Plains, Terrain.Plains, Terrain.Water, Terrain.Water),
-	Tile(1, 0, Terrain.Water, Terrain.Plains, Terrain.Forest, Terrain.Plains, Terrain.Plains),
-	Tile(2, 0, Terrain.Plains, Terrain.Mountains, Terrain.Forest, Terrain.Hills, Terrain.Hills),
+	Tile(Terrain.Water, Terrain.Plains, Terrain.Plains, Terrain.Water, Terrain.Water),
+	Tile(Terrain.Water, Terrain.Plains, Terrain.Forest, Terrain.Plains, Terrain.Plains),
+	Tile(Terrain.Plains, Terrain.Mountains, Terrain.Forest, Terrain.Hills, Terrain.Hills),
 
-	Tile(0, 1, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains),
-	Tile(1, 1, Terrain.Forest, Terrain.Forest, Terrain.Forest, Terrain.Plains, Terrain.Forest),
-	Tile(2, 1, Terrain.Forest, Terrain.Mountains, Terrain.Mountains, Terrain.Forest, Terrain.Forest),
+	Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains),
+	Tile(Terrain.Forest, Terrain.Forest, Terrain.Forest, Terrain.Plains, Terrain.Forest),
+	Tile(Terrain.Forest, Terrain.Mountains, Terrain.Mountains, Terrain.Forest, Terrain.Forest),
 
-	Tile(0, 2, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Water),
-	Tile(1, 2, Terrain.Forest, Terrain.Hills, Terrain.Mountains, Terrain.Plains, Terrain.Hills),
-	Tile(2, 2, Terrain.Mountains, Terrain.Mountains, Terrain.Mountains, Terrain.Hills, Terrain.Mountains)
+	Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Water),
+	Tile(Terrain.Forest, Terrain.Hills, Terrain.Mountains, Terrain.Plains, Terrain.Hills),
+	Tile(Terrain.Mountains, Terrain.Mountains, Terrain.Mountains, Terrain.Hills, Terrain.Mountains)
 )
 
-val map = Map(tiles, 3, 3)
-
-map.toString(8, 3, 2, 2)
+val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
+val map = Map().add((0, 0), tile).add((1, 0), tile)
+print(map.toString)
+/*
+var map = Map()
+map = map.add((0, 0), tiles(0))
+print(map)
+map = map.add((1, 0), tiles(1))
+map = map.add((2, 0), tiles(2))
+map = map.add((0, 1), tiles(3))
+map = map.add((0, 2), tiles(6))
+print(map)*/
+// map.toString(8, 3, 2, 2)
