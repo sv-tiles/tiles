@@ -18,12 +18,13 @@ val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, 
 val map = Map().add((0, 0), tile).add((1, 0), tile)
 print(map.toString)
 /*
-var map = Map()
-map = map.add((0, 0), tiles(0))
-print(map)
-map = map.add((1, 0), tiles(1))
-map = map.add((2, 0), tiles(2))
-map = map.add((0, 1), tiles(3))
-map = map.add((0, 2), tiles(6))
-print(map)*/
+	var map = Map()
+	map = map.add((0, 0), tiles(0))
+	print(map)
+	map = map.add((1, 0), tiles(1))
+	map = map.add((2, 0), tiles(2))
+	map = map.add((0, 1), tiles(3))
+	map = map.add((0, 2), tiles(6))
+	print(map)
+*/
 // map.toString(8, 3, 2, 2)

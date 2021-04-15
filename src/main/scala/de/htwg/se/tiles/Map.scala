@@ -5,9 +5,9 @@ import scala.collection.immutable.HashMap
 case class Map(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile]()) {
 	def add(pos: (Int, Int), tile: Tile): Map = {
 		if (tiles.contains(pos)) {
-			throw new PlacementException("")
+			throw PlacementException("")
 		}
-		return copy(tiles.updated(pos, tile))
+		copy(tiles.updated(pos, tile))
 	}
 
 	override def toString: String = {
@@ -29,16 +29,17 @@ case class Map(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile](
 		require(mapWidth > 0)
 		require(mapHeight > 0)
 
-		val rows = mapHeight / (tileHeight + margin / 2) + offset._2
-		val cols = mapWidth / (tileWidth + margin) + offset._1
+		val rows = Math.ceil(mapHeight / (tileHeight + margin / 2).doubleValue + offset._2).intValue
+		val cols = Math.ceil(mapWidth / (tileWidth + margin).doubleValue + offset._1).intValue
 
-		(for (y <- offset._2 until cols; line <- 0 until tileHeight + margin / 2) yield
-			(for (x <- offset._1 until rows) yield (
-				if (tiles.contains(x, y))
-					this.tiles(x, y).printLine(line, tileWidth, tileHeight, border, margin)
-				else
-					" " * (tileWidth + margin)
-				)).mkString.substring(0, mapWidth) + "\n"
+		(for (y <- offset._2 until rows; line <- 0 until tileHeight + margin / 2) yield
+			(for (x <- offset._1 until cols) yield if (tiles.contains(x, y)) {
+				println("1: " + this.tiles(x, y).printLine(line, tileWidth, tileHeight, border, margin).length)
+				this.tiles(x, y).printLine(line, tileWidth, tileHeight, border, margin)
+			} else {
+				println("2: " + (tileWidth + margin))
+				" " * (tileWidth + margin)
+			}).mkString.substring(0, mapWidth) + "\n"
 			).grouped(mapHeight).next().mkString
 	}
 }

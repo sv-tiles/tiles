@@ -14,6 +14,10 @@ class TileSpec extends AnyWordSpec with Matchers {
 			"return the center terrain symbol when toString is called" in {
 				tile.toString shouldBe Terrain.Plains.symbol
 			}
+
+		}
+		"printed" should {
+			val tile = Tile(Terrain.Water, Terrain.Mountains, Terrain.Forest, Terrain.Hills, Terrain.Plains)
 			val width = 10
 			val height = 5
 			val border = 2
@@ -40,8 +44,6 @@ class TileSpec extends AnyWordSpec with Matchers {
 			}
 			"have a valid multiline representation" in {
 				val t = for (x <- 0 until height + margin / 2) yield tile.printLine(x, width, height, border, margin)
-				println(t.map(l => l.length).sum)
-				println((height + margin).doubleValue)
 				t.map(l => l.length) should contain only width + margin
 				t.head.length shouldBe width + margin
 				t.length shouldBe height + margin / 2
