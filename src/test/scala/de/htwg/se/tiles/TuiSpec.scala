@@ -76,6 +76,9 @@ class TuiSpec extends AnyWordSpec with Matchers {
 			"return 'stopping' on 'exit'" in {
 				testOnlyMsg(tui, tui.command("exit")) shouldBe "stopping"
 			}
+			"print map" in {
+				tui.getMapView shouldBe map.toString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2)
+			}
 		}
 	}
 

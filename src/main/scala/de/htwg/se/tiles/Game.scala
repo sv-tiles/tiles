@@ -9,10 +9,16 @@ object Game {
 		var msg = Option.empty[String]
 
 		do {
+			print("\u001b[2J")
+			print(Console.BOLD)
+			print(Console.GREEN)
 			println(tui.getMapView)
+			print(Console.RESET)
+			print(Console.UNDERLINED)
 			if (msg.isDefined) {
 				println(msg.get)
 			}
+			print(Console.RESET)
 			input = readLine()
 			val (newTui, newMsg) = tui.command(input)
 			tui = newTui

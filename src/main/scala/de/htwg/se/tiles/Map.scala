@@ -40,7 +40,9 @@ case class Map(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile](
 				// println("2: " + (tileWidth + margin))
 				" " * (tileWidth + margin)
 			}).mkString.substring(0, mapWidth)
-		(if (frame) lines.map(l => "|" + l + "|\n") else lines.map(l => l + "\n"))
+		val text = (if (frame) lines.map(l => "|" + l + "|\n") else lines.map(l => l + "\n"))
 			.grouped(mapHeight).next().mkString
+
+		(if (frame) "+" + "-" * mapWidth + "+\n" else "") + text + (if (frame) "+" + "-" * mapWidth + "+" else "")
 	}
 }
