@@ -1,5 +1,15 @@
 package de.htwg.se.tiles
 
+import scala.util.Random
+
+object Tile {
+	def random(seed: Long = System.currentTimeMillis()): Tile = {
+		Random.setSeed(seed)
+		val arr = Vector() ++ Terrain.defaults
+		val max = arr.size
+		Tile(arr(Random.nextInt(max)), arr(Random.nextInt(max)), arr(Random.nextInt(max)), arr(Random.nextInt(max)), arr(Random.nextInt(max)))
+	}
+}
 
 case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain) {
 	def printLine(line: Int, width: Int, height: Int, border: Int, margin: Int): String = {

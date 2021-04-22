@@ -34,10 +34,10 @@ case class Map(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile](
 
 		(for (y <- offset._2 until rows; line <- 0 until tileHeight + margin / 2) yield
 			(for (x <- offset._1 until cols) yield if (tiles.contains(x, y)) {
-				println("1: " + this.tiles(x, y).printLine(line, tileWidth, tileHeight, border, margin).length)
+				// println("1: " + this.tiles(x, y).printLine(line, tileWidth, tileHeight, border, margin).length)
 				this.tiles(x, y).printLine(line, tileWidth, tileHeight, border, margin)
 			} else {
-				println("2: " + (tileWidth + margin))
+				// println("2: " + (tileWidth + margin))
 				" " * (tileWidth + margin)
 			}).mkString.substring(0, mapWidth) + "\n"
 			).grouped(mapHeight).next().mkString
