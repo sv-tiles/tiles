@@ -43,6 +43,13 @@ class MapSpec extends AnyWordSpec with Matchers {
 				lines.length shouldBe mapHeight
 
 			}
+			"have the right size with frame" in {
+				val lines = map.toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, true).split("\n")
+				lines.map(l => l.length).sum shouldBe (mapWidth + 2) * mapHeight
+				lines.head.length shouldBe (mapWidth + 2)
+				lines.length shouldBe mapHeight
+
+			}
 		}
 		"tile added" should {
 			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
