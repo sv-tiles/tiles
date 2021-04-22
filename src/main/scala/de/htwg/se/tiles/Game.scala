@@ -14,7 +14,6 @@ object Game {
 			print(Console.GREEN)
 
 			println(tui.getMapView.split("\n").map(l => """>.*<|^[^>]*<|>[^<]*$""".r.replaceAllIn(l, m => Console.RED + m.matched + Console.GREEN)).mkString("\n"))
-			print(tui.getMapView)
 			print(Console.RESET)
 			print(Console.UNDERLINED)
 			if (msg.isDefined) {
