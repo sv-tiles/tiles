@@ -23,7 +23,7 @@ class MapSpec extends AnyWordSpec with Matchers {
 			val border = 2
 			val margin = 2
 			"return blank if empty" in {
-				Map().toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin) shouldBe (" " * mapWidth + "\n") * mapHeight
+				Map().toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, false) shouldBe (" " * mapWidth + "\n") * mapHeight
 			}
 			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
 			val map = Map().add((0, 0), tile).add((1, 0), tile)
@@ -37,7 +37,7 @@ class MapSpec extends AnyWordSpec with Matchers {
 				an[IllegalArgumentException] should be thrownBy map.toString(offset, mapWidth, 0, tileWidth, tileHeight, border, margin)
 			}
 			"have the right size" in {
-				val lines = map.toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin).split("\n")
+				val lines = map.toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, false).split("\n")
 				lines.map(l => l.length).sum shouldBe mapWidth * mapHeight
 				lines.head.length shouldBe mapWidth
 				lines.length shouldBe mapHeight
