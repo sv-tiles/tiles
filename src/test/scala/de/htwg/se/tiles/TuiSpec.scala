@@ -8,21 +8,21 @@ class TuiSpec extends AnyWordSpec with Matchers {
 		"initializing" should {
 
 			"throw exception when scale < 3" in {
-				an[IllegalArgumentException] should be thrownBy Tui(1, 1, 2, (0, 0), Map())
+				an[IllegalArgumentException] should be thrownBy Tui(1, 1, 2, (0, 0), Map(), Option.empty)
 			}
 			"throw exception when width < 1" in {
-				an[IllegalArgumentException] should be thrownBy Tui(0, 1, 3, (0, 0), Map())
+				an[IllegalArgumentException] should be thrownBy Tui(0, 1, 3, (0, 0), Map(), Option.empty)
 			}
 			"throw exception when height < 1" in {
-				an[IllegalArgumentException] should be thrownBy Tui(1, 0, 3, (0, 0), Map())
+				an[IllegalArgumentException] should be thrownBy Tui(1, 0, 3, (0, 0), Map(), Option.empty)
 			}
 		}
 		"initialized" should {
 			val map = Map()
 			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
-			val tui = Tui(50, 30, 3, (0, 0), map)
+			val tui = Tui(50, 30, 3, (0, 0), map, Option.empty)
 			"unapply" in {
-				Tui.unapply(tui).get shouldBe(50, 30, 3, (0, 0), map)
+				Tui.unapply(tui).get shouldBe(50, 30, 3, (0, 0), map, Option.empty)
 			}
 			"move offset (x/y) by 1 on 'w', 'a', 's', 'd'" in {
 				testNoMsg(tui.command("w")).offset._2 shouldBe tui.offset._2 - 1
@@ -69,6 +69,21 @@ class TuiSpec extends AnyWordSpec with Matchers {
 			"get size on 'size'" in {
 				testOnlyMsg(tui, tui.command("size")) shouldBe "Size: " + tui.width + " " + tui.height
 			}
+			"set highlight on 'highlight <x> <y>'" in {
+				val r = testNoMsg(tui.command("highlight 0 0")).highlight
+				r.isDefined shouldBe true
+				r.get shouldBe(0, 0)
+			}
+			"reset highlight on 'highlight none'" in {
+				val tui2 = tui.copy(highlight = Option((0, 0)))
+				testNoMsg(tui2.command("highlight none")).highlight.isDefined shouldBe false
+			}
+			"get highlight on 'highlight'" in {
+				val tui2 = tui.copy(highlight = Option.empty)
+				testOnlyMsg(tui2, tui2.command("highlight")) shouldBe "Highlight: none"
+				val tui3 = tui.copy(highlight = Option((0, 0)))
+				testOnlyMsg(tui3, tui3.command("highlight")) shouldBe "Highlight: 0 0"
+			}
 			"should not do anything on unknown command" in {
 				val command = "unknownCoMmaNd"
 				testOnlyMsg(tui, tui.command(command)) shouldBe "Unknown command: " + command
@@ -77,7 +92,9 @@ class TuiSpec extends AnyWordSpec with Matchers {
 				testOnlyMsg(tui, tui.command("exit")) shouldBe "stopping"
 			}
 			"print map" in {
-				tui.getMapView shouldBe map.toString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2)
+				tui.getMapView shouldBe map.toString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option.empty)
+				val tui2 = tui.copy(highlight = Option(1, 0))
+				tui2.getMapView shouldBe map.toString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option(1, 0))
 			}
 		}
 	}
