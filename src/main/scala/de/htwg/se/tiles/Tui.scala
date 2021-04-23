@@ -7,7 +7,7 @@ case class Tui(width: Int, height: Int, scale: Int, offset: (Int, Int), map: Map
 	require(width >= 1)
 	require(height >= 1)
 
-	def command(command: String): (Tui, Option[String]) = command match {
+	def command(command: String): (Tui, Option[String]) = command.replaceAll("\\W+", " ").trim() match {
 		case "w" => (this.copy(offset = offset.copy(_2 = offset._2 - 1)), Option.empty)
 		case "a" => (this.copy(offset = offset.copy(_1 = offset._1 - 1)), Option.empty)
 		case "s" => (this.copy(offset = offset.copy(_2 = offset._2 + 1)), Option.empty)
