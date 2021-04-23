@@ -54,6 +54,10 @@ class MapSpec extends AnyWordSpec with Matchers {
 				map.toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, true) shouldBe map.toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, true, Option((0, 0))).replaceAll("[<>]", " ")
 				map.toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, false) shouldBe map.toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, false, Option((0, 0))).replaceAll("[<>]", " ")
 			}
+			"have correct highlighting" in {
+				map.toString((0, 0), 6, 6, 5, 6, 2, 1, false, Option((0, 0))) shouldBe "  _  <\n_____<\n_____<\n_____<\n_____<\n  _  <\n"
+				map.toString((0, 0), 6, 6, 5, 6, 2, 1, false, Option((1, 0))) shouldBe "  _  >\n_____>\n_____>\n_____>\n_____>\n  _  >\n"
+			}
 		}
 		"tile added" should {
 			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
