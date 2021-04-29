@@ -3,7 +3,6 @@ package de.htwg.se.tiles.model
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-import java.util.Optional
 import scala.collection.immutable.HashMap
 
 
@@ -78,50 +77,50 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			val tile1 = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
 			val tile2 = Tile(Terrain.Hills, Terrain.Hills, Terrain.Hills, Terrain.Hills, Terrain.Hills)
 			"do nothing if already in place" in {
-				val board = Board(new HashMap().updated((10, 10), tile1), Optional.empty, Optional.of((10, 10)))
+				val board = Board(new HashMap().updated((10, 10), tile1), Option.empty, Option((10, 10)))
 				board.placeCurrentTile((10, 10)) shouldBe board
 			}
 			"throw exception if already occupied" in {
-				val board1 = Board(new HashMap().updated((10, 10), tile1).updated((0, 0), tile2), Optional.empty, Optional.of((0, 0)))
+				val board1 = Board(new HashMap().updated((10, 10), tile1).updated((0, 0), tile2), Option.empty, Option((0, 0)))
 				an[PlacementException] should be thrownBy board1.placeCurrentTile((10, 10))
 
-				val board2 = Board(new HashMap().updated((10, 10), tile1), Optional.of(tile2), Optional.empty)
+				val board2 = Board(new HashMap().updated((10, 10), tile1), Option(tile2), Option.empty)
 				an[PlacementException] should be thrownBy board2.placeCurrentTile((10, 10))
 			}
 			"place it" in {
-				val board1 = Board(new HashMap().updated((0, 0), tile1), Optional.empty, Optional.of((0, 0)))
-				board1.placeCurrentTile((10, 10)) shouldBe board1.copy(tiles = new HashMap().updated((10, 10), tile1), currentPos = Optional.of((10, 10)))
+				val board1 = Board(new HashMap().updated((0, 0), tile1), Option.empty, Option((0, 0)))
+				board1.placeCurrentTile((10, 10)) shouldBe board1.copy(tiles = new HashMap().updated((10, 10), tile1), currentPos = Option((10, 10)))
 
-				val board2 = Board(new HashMap(), Optional.of(tile1), Optional.empty)
-				board2.placeCurrentTile((10, 10)) shouldBe board2.copy(tiles = board2.tiles.updated((10, 10), tile1), currentPos = Optional.of((10, 10)), currentTile = Optional.empty())
+				val board2 = Board(new HashMap(), Option(tile1), Option.empty)
+				board2.placeCurrentTile((10, 10)) shouldBe board2.copy(tiles = board2.tiles.updated((10, 10), tile1), currentPos = Option((10, 10)), currentTile = Option.empty)
 
-				val board3 = Board(new HashMap().updated((0, 0), tile1), Optional.of(tile2), Optional.empty())
-				board3.placeCurrentTile((10, 10)) shouldBe board3.copy(tiles = board3.tiles.updated((10, 10), tile2), currentPos = Optional.of((10, 10)), currentTile = Optional.empty())
+				val board3 = Board(new HashMap().updated((0, 0), tile1), Option(tile2), Option.empty)
+				board3.placeCurrentTile((10, 10)) shouldBe board3.copy(tiles = board3.tiles.updated((10, 10), tile2), currentPos = Option((10, 10)), currentTile = Option.empty)
 			}
 		}
 		"rotate current tile" should {
 			val tile1 = Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
 			"rotate the tile" in {
-				val board1 = Board(new HashMap().updated((0, 0), tile1), Optional.empty, Optional.of((0, 0)))
+				val board1 = Board(new HashMap().updated((0, 0), tile1), Option.empty, Option((0, 0)))
 				board1.rotateCurrentTile(true) shouldBe board1.copy(tiles = new HashMap().updated((0, 0), tile1.rotate(true)))
 				board1.rotateCurrentTile(false) shouldBe board1.copy(tiles = new HashMap().updated((0, 0), tile1.rotate(false)))
 
-				val board2 = Board(new HashMap(), Optional.of(tile1), Optional.empty)
-				board2.rotateCurrentTile(true) shouldBe board2.copy(currentTile = Optional.of(tile1.rotate(true)))
-				board2.rotateCurrentTile(false) shouldBe board2.copy(currentTile = Optional.of(tile1.rotate(false)))
+				val board2 = Board(new HashMap(), Option(tile1), Option.empty)
+				board2.rotateCurrentTile(true) shouldBe board2.copy(currentTile = Option(tile1.rotate(true)))
+				board2.rotateCurrentTile(false) shouldBe board2.copy(currentTile = Option(tile1.rotate(false)))
 			}
 		}
 		"commit" should {
 			val tile1 = Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
 			"throw exception if tile not placed" in {
-				val board = Board(new HashMap(), Optional.of(tile1), Optional.empty)
+				val board = Board(new HashMap(), Option(tile1), Option.empty)
 				an[PlacementException] should be thrownBy board.commit()
 			}
 			"generate a new current tile and discard current pos" in {
-				val board = Board(new HashMap().updated((0, 0), tile1), Optional.empty, Optional.of((0, 0)))
+				val board = Board(new HashMap().updated((0, 0), tile1), Option.empty, Option((0, 0)))
 				val committed = board.commit()
-				committed shouldBe board.copy(currentPos = Optional.empty(), currentTile = committed.currentTile)
-				committed.currentTile should not be Optional.empty()
+				committed shouldBe board.copy(currentPos = Option.empty, currentTile = committed.currentTile)
+				committed.currentTile should not be Option.empty
 			}
 		}
 	}

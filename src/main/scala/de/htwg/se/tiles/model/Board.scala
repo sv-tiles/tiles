@@ -1,27 +1,26 @@
 package de.htwg.se.tiles.model
 
-import java.util.Optional
 import scala.collection.immutable.HashMap
 
 
 // @throws[IllegalArgumentException]
-case class Board(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile](), currentTile: Optional[Tile] = Optional.of(Tile.random()), currentPos: Optional[(Int, Int)] = Optional.empty()) {
-	require(currentTile.isEmpty ^ currentPos.isEmpty, "current tile XOR current pos! (" + currentTile.isPresent + ", " + currentPos.isPresent + ")")
-	require(currentPos.isEmpty || tiles.contains(currentPos.get()), "At current pos has to be a tile")
+case class Board(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile](), currentTile: Option[Tile] = Option(Tile.random()), currentPos: Option[(Int, Int)] = Option.empty) {
+	require(currentTile.isEmpty ^ currentPos.isEmpty, "current tile XOR current pos! (" + currentTile.isDefined + ", " + currentPos.isDefined + ")")
+	require(currentPos.isEmpty || tiles.contains(currentPos.get), "At current pos has to be a tile")
 
-	def rotateCurrentTile(clockwise: Boolean = true): Board = if (currentTile.isPresent)
+	def rotateCurrentTile(clockwise: Boolean = true): Board = if (currentTile.isDefined)
 		copy(currentTile = currentTile.map(t => t.rotate(clockwise))) else
-		copy(tiles = tiles.updated(currentPos.get(), tiles(currentPos.get()).rotate(clockwise)))
+		copy(tiles = tiles.updated(currentPos.get, tiles(currentPos.get).rotate(clockwise)))
 
 	@throws[PlacementException]("Already occupied")
 	def placeCurrentTile(pos: (Int, Int)): Board = {
-		if (currentTile.isPresent) {
-			place(pos, currentTile.get()).copy(currentTile = Optional.empty(), currentPos = Optional.of(pos))
-		} else if (pos == currentPos.get()) {
+		if (currentTile.isDefined) {
+			place(pos, currentTile.get).copy(currentTile = Option.empty, currentPos = Option(pos))
+		} else if (pos == currentPos.get) {
 			this
 		} else {
-			val placed = place(pos, tiles(currentPos.get()))
-			placed.copy(tiles = placed.tiles.removed(currentPos.get()), currentPos = Optional.of(pos))
+			val placed = place(pos, tiles(currentPos.get))
+			placed.copy(tiles = placed.tiles.removed(currentPos.get), currentPos = Option(pos))
 		}
 	}
 
@@ -35,8 +34,10 @@ case class Board(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile
 
 	@throws[PlacementException]("Tile not placed")
 	def commit(): Board = {
-		currentPos.orElseThrow(() => PlacementException("Tile not placed"))
-		copy(currentPos = Optional.empty(), currentTile = Optional.of(Tile.random()))
+		if (currentPos.isEmpty) {
+			throw PlacementException("Tile not placed")
+		}
+		copy(currentPos = Option.empty, currentTile = Option(Tile.random()))
 	}
 
 	def boardToString: String = {

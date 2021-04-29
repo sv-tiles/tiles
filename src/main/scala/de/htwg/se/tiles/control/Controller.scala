@@ -23,5 +23,5 @@ class Controller(var board: Board = Board()) extends Observable[Unit] {
 		board.boardToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame, highlight)
 
 	def currentTileToString(width: Int, height: Int, border: Int, margin: Int): String =
-		board.currentTile.map[String](t => t.tileToString(width, height, border, margin)).orElse("Tile placed")
+		board.currentTile.map[String](t => t.tileToString(width, height, border, margin)).getOrElse("Tile placed")
 }

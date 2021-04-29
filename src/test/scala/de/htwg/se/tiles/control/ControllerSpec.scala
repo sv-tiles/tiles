@@ -55,7 +55,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			val height = 5
 			val margin = 2
 			val border = 2
-			controller.currentTileToString(width, height, border, margin) shouldBe board.currentTile.get().tileToString(width, height, border, margin)
+			controller.currentTileToString(width, height, border, margin) shouldBe board.currentTile.get.tileToString(width, height, border, margin)
 		}
 	}
 }
