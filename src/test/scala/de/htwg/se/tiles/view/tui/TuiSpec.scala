@@ -10,88 +10,133 @@ class TuiSpec extends AnyWordSpec with Matchers {
 		"initializing" should {
 
 			"throw exception when scale < 3" in {
-				an[IllegalArgumentException] should be thrownBy Tui(new Controller(), 1, 1, 2, (0, 0), Option.empty)
+				an[IllegalArgumentException] should be thrownBy new Tui(new Controller(), 1, 1, 2, (0, 0), Option.empty)
 			}
 			"throw exception when width < 1" in {
-				an[IllegalArgumentException] should be thrownBy Tui(new Controller(), 0, 1, 3, (0, 0), Option.empty)
+				an[IllegalArgumentException] should be thrownBy new Tui(new Controller(), 0, 1, 3, (0, 0), Option.empty)
 			}
 			"throw exception when height < 1" in {
-				an[IllegalArgumentException] should be thrownBy Tui(new Controller(), 1, 0, 3, (0, 0), Option.empty)
+				an[IllegalArgumentException] should be thrownBy new Tui(new Controller(), 1, 0, 3, (0, 0), Option.empty)
 			}
 		}
 		"initialized" should {
 			val controller = new Controller(Board())
 			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
-			val tui = Tui(controller, 50, 30, 3, (0, 0), Option.empty)
-			"unapply" in {
-				Tui.unapply(tui).get shouldBe(controller, 50, 30, 3, (0, 0), Option.empty)
-			}
+
+			val width = 50
+			val height = 30
+			val scale = 3
+
+
 			"move offset (x/y) by 1 on 'w', 'a', 's', 'd'" in {
-				testNoMsg(tui.command("w")).offset._2 shouldBe tui.offset._2 - 1
-				testNoMsg(tui.command("a")).offset._1 shouldBe tui.offset._1 - 1
-				testNoMsg(tui.command("s")).offset._2 shouldBe tui.offset._2 + 1
-				testNoMsg(tui.command("d")).offset._1 shouldBe tui.offset._1 + 1
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+				val original = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("w").isEmpty shouldBe true
+				tui.offset._2 shouldBe original.offset._2 - 1
+				tui.command("a").isEmpty shouldBe true
+				tui.offset._1 shouldBe original.offset._1 - 1
+				tui.command("s").isEmpty shouldBe true
+				tui.offset._2 shouldBe original.offset._2
+				tui.command("d").isEmpty shouldBe true
+				tui.offset._1 shouldBe original.offset._1
 			}
 			"set offset on 'position <x> <y>'" in {
-				testNoMsg(tui.command("position 10 20")).offset shouldBe(10, 20)
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("position 10 20").isEmpty shouldBe true
+				tui.offset shouldBe(10, 20)
 			}
 			"get offset on 'position'" in {
-				testOnlyMsg(tui, tui.command("position")) shouldBe "Position: " + tui.offset._1 + " " + tui.offset._2
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("position").get shouldBe "Position: " + tui.offset._1 + " " + tui.offset._2
 			}
 			"set scale to 'f' on 'scale <f>" in {
-				testNoMsg(tui.command("scale 10")).scale shouldBe 10
-				testNoMsg(tui.command("scale 20")).scale shouldBe 20
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("scale 10").isEmpty shouldBe true
+				tui.scale shouldBe 10
+				tui.command("scale 20").isEmpty shouldBe true
+				tui.scale shouldBe 20
 			}
 			"get scale on 'scale'" in {
-				testOnlyMsg(tui, tui.command("scale")) shouldBe "Scale: " + tui.scale
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("scale").get shouldBe "Scale: " + tui.scale
 			}
 			"set width to 'n' on 'width <n>" in {
-				testNoMsg(tui.command("width 200")).width shouldBe 200
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("width 200").isEmpty shouldBe true
+				tui.width shouldBe 200
 			}
 			"get width on 'width'" in {
-				testOnlyMsg(tui, tui.command("width")) shouldBe "Width: " + tui.width
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("width").get shouldBe "Width: " + tui.width
 			}
 			"set height to 'n' on 'height <n>" in {
-				testNoMsg(tui.command("height 200")).height shouldBe 200
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("height 200").isEmpty shouldBe true
+				tui.height shouldBe 200
 			}
 			"get height on 'height'" in {
-				testOnlyMsg(tui, tui.command("height")) shouldBe "Height: " + tui.height
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("height").get shouldBe "Height: " + tui.height
 			}
 			"set size to 'width', 'height' on 'size <width> <height>" in {
-				val newTui = testNoMsg(tui.command("size 200 100"))
-				newTui.width shouldBe 200
-				newTui.height shouldBe 100
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("size 200 100").isEmpty shouldBe true
+				tui.width shouldBe 200
+				tui.height shouldBe 100
 			}
 			"get size on 'size'" in {
-				testOnlyMsg(tui, tui.command("size")) shouldBe "Size: " + tui.width + " " + tui.height
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("size").get shouldBe "Size: " + tui.width + " " + tui.height
 			}
 			"set highlight on 'highlight <x> <y>'" in {
-				val r = testNoMsg(tui.command("highlight 0 0")).highlight
-				r.isDefined shouldBe true
-				r.get shouldBe(0, 0)
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("highlight 0 0").isEmpty shouldBe true
+				tui.highlight.isDefined shouldBe true
+				tui.highlight.get shouldBe(0, 0)
 			}
 			"reset highlight on 'highlight none'" in {
-				val tui2 = tui.copy(highlight = Option((0, 0)))
-				testNoMsg(tui2.command("highlight none")).highlight.isDefined shouldBe false
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option((0, 0)))
+
+				tui.command("highlight none").isEmpty shouldBe true
+				tui.highlight.isDefined shouldBe false
 			}
 			"get highlight on 'highlight'" in {
-				val tui2 = tui.copy(highlight = Option.empty)
-				testOnlyMsg(tui2, tui2.command("highlight")) shouldBe "Highlight: none"
-				val tui3 = tui.copy(highlight = Option((0, 0)))
-				testOnlyMsg(tui3, tui3.command("highlight")) shouldBe "Highlight: 0 0"
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("highlight").get shouldBe "Highlight: none"
+				tui.highlight = Option((0, 0))
+				tui.command("highlight").get shouldBe "Highlight: 0 0"
 			}
 			"should not do anything on unknown command" in {
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
 				val command = "unknownCoMmaNd"
-				testOnlyMsg(tui, tui.command(command)) shouldBe "Unknown command: " + command
+				tui.command(command).get shouldBe "Unknown command: " + command
 			}
 			"return 'stopping' on 'exit'" in {
-				testOnlyMsg(tui, tui.command("exit")) shouldBe "stopping"
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
+				tui.command("exit").get shouldBe "stopping"
 			}
 			"print view" in {
+				val tui = new Tui(controller, width, height, scale, (0, 0), Option.empty)
+
 				tui.getView shouldBe controller.mapToString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option.empty) + "\n" +
 					controller.currentTileToString(tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2).trim() + "\n\n"
-				val tui2 = tui.copy(highlight = Option(1, 0))
-				tui2.getView shouldBe controller.mapToString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option(1, 0)) + "\n" +
+				tui.highlight = Option((1, 0))
+				tui.getView shouldBe controller.mapToString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option(1, 0)) + "\n" +
 					controller.currentTileToString(tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2).trim() + "\n\n"
 			}
 		}

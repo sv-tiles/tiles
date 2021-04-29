@@ -8,7 +8,7 @@ import scala.io.StdIn.readLine
 object Game {
 	def main(args: Array[String]): Unit = {
 		var input: String = ""
-		var tui = Tui(new Controller(), 120, 30, 5, (0, 0), Option.empty)
+		var tui = new Tui(new Controller(), 120, 30, 5, (0, 0), Option.empty)
 		var msg = Option.empty[String]
 
 		do {
@@ -24,9 +24,7 @@ object Game {
 			}
 			print(Console.RESET)
 			input = readLine()
-			val (newTui, newMsg) = tui.command(input)
-			tui = newTui
-			msg = newMsg
+			msg = tui.command(input)
 		} while (input != "exit")
 	}
 }
