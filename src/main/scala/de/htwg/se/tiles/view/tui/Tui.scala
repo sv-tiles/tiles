@@ -4,10 +4,12 @@ import de.htwg.se.tiles.control.Controller
 
 import scala.util.Try
 
-class Tui(controller: Controller, var width: Int, var height: Int, var scale: Int, var offset: (Int, Int), var highlight: Option[(Int, Int)]) {
+class Tui(controller: Controller, var width: Int, var height: Int, var scale: Int, var offset: (Int, Int)) {
 	require(scale >= 3)
 	require(width >= 1)
 	require(height >= 1)
+
+	var cursor: (Int, Int) = (0, 0)
 
 	def command(command: String): Option[String] = {
 		var result = Option.empty[String]
@@ -30,13 +32,39 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 				this.width = width.toInt
 				this.height = height.toInt
 			case "size" => result = Option("Size: " + width + " " + height)
-			case s"highlight $x $y" if Try(x.toInt).isSuccess && Try(y.toInt).isSuccess =>
-				highlight = Option((x.toInt, y.toInt))
-			case "highlight none" => highlight = Option.empty
-			case "highlight" =>
-				result = Option("Highlight: " + (if (highlight.isDefined) highlight.get._1 + " " + highlight.get._2 else "none"))
 			case "exit" => result = Option("stopping")
 
+			case "clear" => controller.clear()
+			case "place" => controller.commit()
+			case "t" =>
+				cursor = (cursor._1, cursor._2 - 1)
+				if (!controller.placeTile(cursor)._1) {
+					result = Option("OCCUPIED")
+				}
+			case "g" =>
+				cursor = (cursor._1, cursor._2 + 1)
+				if (!controller.placeTile(cursor)._1) {
+					result = Option("OCCUPIED")
+				}
+			case "f" =>
+				cursor = (cursor._1 - 1, cursor._2)
+				if (!controller.placeTile(cursor)._1) {
+					result = Option("OCCUPIED")
+				}
+			case "h" =>
+				cursor = (cursor._1 + 1, cursor._2)
+				if (!controller.placeTile(cursor)._1) {
+					result = Option("OCCUPIED")
+				}
+			case "q" | "r" =>
+				controller.rotate(false)
+			case "e" | "z" =>
+				controller.rotate(true)
+			case "cursor reset" =>
+				cursor = offset
+				if (!controller.placeTile(cursor)._1) {
+					result = Option("OCCUPIED")
+				}
 
 			case _ => result = Option("Unknown command: " + command)
 		}
@@ -44,7 +72,7 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 	}
 
 	def getView: String =
-		controller.mapToString(offset, width, height, scale * 2, scale, Math.max(1, scale * .2).intValue, 2, frame = true, highlight) +
+		controller.mapToString(offset, width, height, scale * 2, scale, Math.max(1, scale * .2).intValue, 2, frame = true, Option(cursor)) +
 			"\n" + controller.currentTileToString(scale * 2, scale, Math.max(1, scale * .2).intValue, 2).trim() + "\n\n"
 
 }
