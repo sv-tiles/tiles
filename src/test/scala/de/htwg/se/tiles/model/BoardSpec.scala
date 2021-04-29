@@ -3,10 +3,10 @@ package de.htwg.se.tiles.model
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class MapSpec extends AnyWordSpec with Matchers {
+class BoardSpec extends AnyWordSpec with Matchers {
 	"A Map" when {
 		"initialized without tiles" should {
-			val map = Map()
+			val map = Board()
 			"be empty" in {
 				map.tiles.isEmpty shouldBe true
 			}
@@ -23,10 +23,10 @@ class MapSpec extends AnyWordSpec with Matchers {
 			val border = 2
 			val margin = 2
 			"return blank if empty" in {
-				Map().toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, false) shouldBe (" " * mapWidth + "\n") * mapHeight
+				Board().toString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, false) shouldBe (" " * mapWidth + "\n") * mapHeight
 			}
 			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
-			val map = Map().add((0, 0), tile).add((1, 0), tile)
+			val map = Board().add((0, 0), tile).add((1, 0), tile)
 			"not throw" in {
 				noException should be thrownBy map.toString
 			}
@@ -61,7 +61,7 @@ class MapSpec extends AnyWordSpec with Matchers {
 		}
 		"tile added" should {
 			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
-			val map = Map().add((0, 0), tile)
+			val map = Board().add((0, 0), tile)
 			"throw if already occupied" in {
 				an[Exception] should be thrownBy map.add((0, 0), tile)
 			}

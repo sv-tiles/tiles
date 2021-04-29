@@ -2,8 +2,8 @@ package de.htwg.se.tiles.model
 
 import scala.collection.immutable.HashMap
 
-case class Map(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile]()) {
-	def add(pos: (Int, Int), tile: Tile): Map = {
+case class Board(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile]()) {
+	def add(pos: (Int, Int), tile: Tile): Board = {
 		if (tiles.contains(pos)) {
 			throw PlacementException("")
 		}

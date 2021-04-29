@@ -1,10 +1,10 @@
 package de.htwg.se.tiles.view.tui
 
-import de.htwg.se.tiles.model.{Map, Tile}
+import de.htwg.se.tiles.model.{Board, Tile}
 
 import scala.util.Try
 
-case class Tui(width: Int, height: Int, scale: Int, offset: (Int, Int), map: Map, highlight: Option[(Int, Int)]) {
+case class Tui(width: Int, height: Int, scale: Int, offset: (Int, Int), map: Board, highlight: Option[(Int, Int)]) {
 	require(scale >= 3)
 	require(width >= 1)
 	require(height >= 1)

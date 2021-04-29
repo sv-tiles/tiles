@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.view.tui
 
-import de.htwg.se.tiles.model.{Map, Terrain, Tile}
+import de.htwg.se.tiles.model.{Board, Terrain, Tile}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -9,17 +9,17 @@ class TuiSpec extends AnyWordSpec with Matchers {
 		"initializing" should {
 
 			"throw exception when scale < 3" in {
-				an[IllegalArgumentException] should be thrownBy Tui(1, 1, 2, (0, 0), Map(), Option.empty)
+				an[IllegalArgumentException] should be thrownBy Tui(1, 1, 2, (0, 0), Board(), Option.empty)
 			}
 			"throw exception when width < 1" in {
-				an[IllegalArgumentException] should be thrownBy Tui(0, 1, 3, (0, 0), Map(), Option.empty)
+				an[IllegalArgumentException] should be thrownBy Tui(0, 1, 3, (0, 0), Board(), Option.empty)
 			}
 			"throw exception when height < 1" in {
-				an[IllegalArgumentException] should be thrownBy Tui(1, 0, 3, (0, 0), Map(), Option.empty)
+				an[IllegalArgumentException] should be thrownBy Tui(1, 0, 3, (0, 0), Board(), Option.empty)
 			}
 		}
 		"initialized" should {
-			val map = Map()
+			val map = Board()
 			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
 			val tui = Tui(50, 30, 3, (0, 0), map, Option.empty)
 			"unapply" in {
