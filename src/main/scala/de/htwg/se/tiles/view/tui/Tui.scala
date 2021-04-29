@@ -1,10 +1,10 @@
 package de.htwg.se.tiles.view.tui
 
-import de.htwg.se.tiles.model.{Board, Tile}
+import de.htwg.se.tiles.control.Controller
 
 import scala.util.Try
 
-case class Tui(width: Int, height: Int, scale: Int, offset: (Int, Int), map: Board, highlight: Option[(Int, Int)]) {
+case class Tui(controller: Controller, width: Int, height: Int, scale: Int, offset: (Int, Int), highlight: Option[(Int, Int)]) {
 	require(scale >= 3)
 	require(width >= 1)
 	require(height >= 1)
@@ -26,16 +26,17 @@ case class Tui(width: Int, height: Int, scale: Int, offset: (Int, Int), map: Boa
 		case s"size $width $height" if Try(width.toInt).isSuccess && Try(height.toInt).isSuccess =>
 			(this.copy(width = width.toInt, height = height.toInt), Option.empty)
 		case "size" => (this, Option("Size: " + width + " " + height))
-		case s"rand $x $y" if Try(x.toInt).isSuccess && Try(y.toInt).isSuccess =>
-			(copy(map = map.add((x.toInt, y.toInt), Tile.random())), Option.empty)
 		case s"highlight $x $y" if Try(x.toInt).isSuccess && Try(y.toInt).isSuccess =>
 			(this.copy(highlight = Option((x.toInt, y.toInt))), Option.empty)
 		case "highlight none" => (this.copy(highlight = Option.empty), Option.empty)
 		case "highlight" => (this, Option("Highlight: " + (if (highlight.isDefined) highlight.get._1 + " " + highlight.get._2 else "none")))
 		case "exit" => (this, Option("stopping"))
+
+
 		case _ => (this, Option("Unknown command: " + command))
 	}
 
-	def getMapView: String =
-		map.toString(offset, width, height, scale * 2, scale, Math.max(1, scale * .2).intValue, 2, true, highlight)
+	def getView: String =
+		controller.mapToString(offset, width, height, scale * 2, scale, Math.max(1, scale * .2).intValue, 2, frame = true, highlight) +
+			"\n" + controller.currentTileToString(scale * 2, scale, Math.max(1, scale * .2).intValue, 2).trim() + "\n\n"
 }

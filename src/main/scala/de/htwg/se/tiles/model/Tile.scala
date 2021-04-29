@@ -12,6 +12,11 @@ object Tile {
 }
 
 case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain) {
+	def rotate(clockwise: Boolean = true): Tile = if (clockwise)
+		copy(north = west, east = north, south = east, west = south) else
+		copy(north = east, east = south, south = west, west = north)
+
+	@throws[IllegalArgumentException]
 	def printLine(line: Int, width: Int, height: Int, border: Int, margin: Int): String = {
 		require(line >= 0 && line < height + margin / 2, "line out of bounds")
 		require(width >= 3, "width too small")
@@ -30,6 +35,9 @@ case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, ce
 			west.symbol * border + center.symbol * (width - (2 * border)) + east.symbol * border + " " * margin
 		}
 	}
+
+	def tileToString(width: Int, height: Int, border: Int, margin: Int): String =
+		(for (i <- 0 until height) yield printLine(i, width, height, border, margin)).mkString("\n")
 
 	override def toString: String = center.symbol
 }

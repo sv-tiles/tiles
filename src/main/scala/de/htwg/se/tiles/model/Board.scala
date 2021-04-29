@@ -1,16 +1,45 @@
 package de.htwg.se.tiles.model
 
+import java.util.Optional
 import scala.collection.immutable.HashMap
 
-case class Board(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile]()) {
-	def add(pos: (Int, Int), tile: Tile): Board = {
+
+// @throws[IllegalArgumentException]
+case class Board(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile](), currentTile: Optional[Tile] = Optional.of(Tile.random()), currentPos: Optional[(Int, Int)] = Optional.empty()) {
+	require(currentTile.isEmpty ^ currentPos.isEmpty, "current tile XOR current pos! (" + currentTile.isPresent + ", " + currentPos.isPresent + ")")
+	require(currentPos.isEmpty || tiles.contains(currentPos.get()), "At current pos has to be a tile")
+
+	def rotateCurrentTile(clockwise: Boolean = true): Board = if (currentTile.isPresent)
+		copy(currentTile = currentTile.map(t => t.rotate(clockwise))) else
+		copy(tiles = tiles.updated(currentPos.get(), tiles(currentPos.get()).rotate(clockwise)))
+
+	@throws[PlacementException]("Already occupied")
+	def placeCurrentTile(pos: (Int, Int)): Board = {
+		if (currentTile.isPresent) {
+			place(pos, currentTile.get()).copy(currentTile = Optional.empty(), currentPos = Optional.of(pos))
+		} else if (pos == currentPos.get()) {
+			this
+		} else {
+			val placed = place(pos, tiles(currentPos.get()))
+			placed.copy(tiles = placed.tiles.removed(currentPos.get()), currentPos = Optional.of(pos))
+		}
+	}
+
+	@throws[PlacementException]("Already occupied")
+	def place(pos: (Int, Int), tile: Tile): Board = {
 		if (tiles.contains(pos)) {
-			throw PlacementException("")
+			throw PlacementException("Already occupied")
 		}
 		copy(tiles.updated(pos, tile))
 	}
 
-	override def toString: String = {
+	@throws[PlacementException]("Tile not placed")
+	def commit(): Board = {
+		currentPos.orElseThrow(() => PlacementException("Tile not placed"))
+		copy(currentPos = Optional.empty(), currentTile = Optional.of(Tile.random()))
+	}
+
+	def boardToString: String = {
 		if (tiles.isEmpty) {
 			return "empty"
 		}
@@ -22,10 +51,11 @@ case class Board(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile
 		val margin = 2
 
 		val off = tiles.keySet.reduce((a, b) => (a._1 min b._1, a._2 min b._2))
-		toString(off, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, false)
+		boardToString(off, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame = false)
 	}
 
-	def toString(offset: (Int, Int), mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[(Int, Int)] = Option.empty): String = {
+	@throws[IllegalArgumentException]
+	def boardToString(offset: (Int, Int), mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[(Int, Int)] = Option.empty): String = {
 		require(mapWidth > 0)
 		require(mapHeight > 0)
 		if (highlight.isDefined) {

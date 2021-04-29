@@ -1,5 +1,6 @@
 package de.htwg.se.tiles.view.tui
 
+import de.htwg.se.tiles.control.Controller
 import de.htwg.se.tiles.model.{Board, Terrain, Tile}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -9,21 +10,21 @@ class TuiSpec extends AnyWordSpec with Matchers {
 		"initializing" should {
 
 			"throw exception when scale < 3" in {
-				an[IllegalArgumentException] should be thrownBy Tui(1, 1, 2, (0, 0), Board(), Option.empty)
+				an[IllegalArgumentException] should be thrownBy Tui(new Controller(), 1, 1, 2, (0, 0), Option.empty)
 			}
 			"throw exception when width < 1" in {
-				an[IllegalArgumentException] should be thrownBy Tui(0, 1, 3, (0, 0), Board(), Option.empty)
+				an[IllegalArgumentException] should be thrownBy Tui(new Controller(), 0, 1, 3, (0, 0), Option.empty)
 			}
 			"throw exception when height < 1" in {
-				an[IllegalArgumentException] should be thrownBy Tui(1, 0, 3, (0, 0), Board(), Option.empty)
+				an[IllegalArgumentException] should be thrownBy Tui(new Controller(), 1, 0, 3, (0, 0), Option.empty)
 			}
 		}
 		"initialized" should {
-			val map = Board()
+			val controller = new Controller(Board())
 			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
-			val tui = Tui(50, 30, 3, (0, 0), map, Option.empty)
+			val tui = Tui(controller, 50, 30, 3, (0, 0), Option.empty)
 			"unapply" in {
-				Tui.unapply(tui).get shouldBe(50, 30, 3, (0, 0), map, Option.empty)
+				Tui.unapply(tui).get shouldBe(controller, 50, 30, 3, (0, 0), Option.empty)
 			}
 			"move offset (x/y) by 1 on 'w', 'a', 's', 'd'" in {
 				testNoMsg(tui.command("w")).offset._2 shouldBe tui.offset._2 - 1
@@ -43,12 +44,6 @@ class TuiSpec extends AnyWordSpec with Matchers {
 			}
 			"get scale on 'scale'" in {
 				testOnlyMsg(tui, tui.command("scale")) shouldBe "Scale: " + tui.scale
-			}
-			"generate random tile at 'x' 'y' on 'rand <x> <y>'" in {
-				Array((3, 4), (7, 2)).foreach(p => {
-					tui.map.tiles.contains(p) shouldBe false
-					testNoMsg(tui.command(s"rand ${p._1} ${p._2}")).map.tiles.contains(p) shouldBe true
-				})
 			}
 			"set width to 'n' on 'width <n>" in {
 				testNoMsg(tui.command("width 200")).width shouldBe 200
@@ -92,10 +87,12 @@ class TuiSpec extends AnyWordSpec with Matchers {
 			"return 'stopping' on 'exit'" in {
 				testOnlyMsg(tui, tui.command("exit")) shouldBe "stopping"
 			}
-			"print map" in {
-				tui.getMapView shouldBe map.toString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option.empty)
+			"print view" in {
+				tui.getView shouldBe controller.mapToString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option.empty) + "\n" +
+					controller.currentTileToString(tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2).trim() + "\n\n"
 				val tui2 = tui.copy(highlight = Option(1, 0))
-				tui2.getMapView shouldBe map.toString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option(1, 0))
+				tui2.getView shouldBe controller.mapToString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option(1, 0)) + "\n" +
+					controller.currentTileToString(tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2).trim() + "\n\n"
 			}
 		}
 	}
