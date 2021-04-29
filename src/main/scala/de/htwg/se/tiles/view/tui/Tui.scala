@@ -1,4 +1,6 @@
-package de.htwg.se.tiles
+package de.htwg.se.tiles.view.tui
+
+import de.htwg.se.tiles.model.{Map, Tile}
 
 import scala.util.Try
 

@@ -1,5 +1,6 @@
-package de.htwg.se.tiles
+package de.htwg.se.tiles.view.tui
 
+import de.htwg.se.tiles.model.{Map, Terrain, Tile}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

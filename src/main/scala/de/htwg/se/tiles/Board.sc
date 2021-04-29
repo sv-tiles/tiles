@@ -1,4 +1,4 @@
-import de.htwg.se.tiles.{Map, Terrain, Tile}
+import de.htwg.se.tiles.model.{Map, Terrain, Tile}
 
 val tiles = Array(
 	Tile(Terrain.Water, Terrain.Plains, Terrain.Plains, Terrain.Water, Terrain.Water),

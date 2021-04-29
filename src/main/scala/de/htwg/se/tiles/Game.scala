@@ -1,5 +1,8 @@
 package de.htwg.se.tiles
 
+import de.htwg.se.tiles.model.Map
+import de.htwg.se.tiles.view.tui.Tui
+
 import scala.io.StdIn.readLine
 
 object Game {
