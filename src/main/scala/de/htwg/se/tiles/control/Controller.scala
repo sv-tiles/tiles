@@ -1,7 +1,7 @@
 package de.htwg.se.tiles.control
 
 import de.htwg.se.tiles.model.Board
-import de.htwg.se.tiles.util.Observable
+import de.htwg.se.tiles.util.{Event, Observable}
 
 import scala.util.Try
 
@@ -9,7 +9,7 @@ class Controller(var board: Board = Board()) extends Observable[(Boolean, String
 
 	def clear(): Unit = {
 		board = Board()
-		notifyObservers((true, ""))
+		notifyObservers(Event(true, ""))
 	}
 
 	def placeTile(pos: (Int, Int)): Unit =
@@ -17,16 +17,18 @@ class Controller(var board: Board = Board()) extends Observable[(Boolean, String
 			if (board.currentPos.isDefined) {
 				board = board.pickupCurrentTile()
 			}
-			notifyObservers((false, e.getMessage))
-		}, _ => notifyObservers((true, "")))
+			notifyObservers(Event(false, e.getMessage))
+		}, _ => notifyObservers(Event(true, "")))
 
 	def rotate(clockwise: Boolean): Unit = {
 		board = board.rotateCurrentTile(clockwise)
-		notifyObservers((true, ""))
+		notifyObservers(Event(true, ""))
 	}
 
 	def commit(): Unit =
-		Try(board.commit()).map(b => board = b).fold(e => notifyObservers((false, e.getMessage)), _ => notifyObservers((true, "")))
+		Try(board.commit()).map(b => board = b).fold(
+			e => notifyObservers(Event(false, e.getMessage)),
+			_ => notifyObservers(Event(true, "")))
 
 	def mapToString(offset: (Int, Int), mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[(Int, Int)] = Option.empty): String = {
 		board.boardToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame, highlight)

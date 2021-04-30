@@ -2,6 +2,7 @@ package de.htwg.se.tiles.view.tui
 
 import de.htwg.se.tiles.control.Controller
 import de.htwg.se.tiles.model.{Board, Terrain, Tile}
+import de.htwg.se.tiles.util.Event
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -166,8 +167,8 @@ class TuiSpec extends AnyWordSpec with Matchers {
 				val tui = new Tui(controller, width, height, scale, (0, 0))
 
 				tui.command("size")
-				noException should be thrownBy tui.update((true, ""))
-				noException should be thrownBy tui.update((true, "Already occupied"))
+				noException should be thrownBy tui.update(Event(true, ""))
+				noException should be thrownBy tui.update(Event(true, "Already occupied"))
 			}
 			"reset board on 'clear'" in {
 				val controller = new Controller(Board(new HashMap().updated((10, 10), tile).updated((0, 0), tile)))

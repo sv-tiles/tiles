@@ -7,5 +7,15 @@ class Observable[T] {
 
 	def remove(observer: Observer[T]): Unit = subscriber = subscriber.filter(e => e != observer)
 
-	def notifyObservers(value: T): Unit = subscriber.foreach(e => e.update(value))
+	def notifyObservers(value: Event[T]): Unit = subscriber.foreach(e => e.update(value))
+}
+
+class ObservableUnit {
+	private var subscriber: Vector[ObserverUnit] = Vector()
+
+	def add(observer: ObserverUnit): Unit = subscriber = subscriber :+ observer
+
+	def remove(observer: ObserverUnit): Unit = subscriber = subscriber.filter(e => e != observer)
+
+	def notifyObservers(): Unit = subscriber.foreach(e => e.update())
 }

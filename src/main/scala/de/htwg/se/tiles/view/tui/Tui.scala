@@ -1,7 +1,7 @@
 package de.htwg.se.tiles.view.tui
 
 import de.htwg.se.tiles.control.Controller
-import de.htwg.se.tiles.util.Observer
+import de.htwg.se.tiles.util.{Event, Observer}
 
 import scala.util.Try
 
@@ -15,7 +15,7 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 	var cursor: (Int, Int) = (0, 0)
 	var result = Option.empty[String]
 
-	update((true, ""))
+	update(Event(true, ""))
 
 	def command(command: String): Option[String] = {
 		result = Option.empty[String]
@@ -65,19 +65,19 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 					case "exit" => result = Option("stopping")
 					case _ => result = Option("Unknown command: " + command)
 				}
-				update((true, ""))
+				update(Event(true, ""))
 		}
 
 
 		result
 	}
 
-	override def update(value: (Boolean, String)): Unit = {
+	override def update(event: Event[(Boolean, String)]): Unit = {
 		print("\u001b[2J")
 		print(Console.BOLD)
 		print(Console.GREEN)
 
-		if (value._2 == "Already occupied") {
+		if (event.data._2 == "Already occupied") {
 			println(getView)
 		} else {
 			println(getView.split("\n").map(l => """>.*<|^[^>]*<|>[^<]*$""".r.replaceAllIn(l, m => Console.RED + m.matched + Console.GREEN)).mkString("\n"))
@@ -87,8 +87,8 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 		if (result.isDefined) {
 			println(result.get)
 		}
-		if (value._2.nonEmpty) {
-			println(value._2)
+		if (event.data._2.nonEmpty) {
+			println(event.data._2)
 		}
 		print(Console.RESET)
 	}
