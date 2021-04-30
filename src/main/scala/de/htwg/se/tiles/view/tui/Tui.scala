@@ -1,18 +1,20 @@
 package de.htwg.se.tiles.view.tui
 
 import de.htwg.se.tiles.control.Controller
+import de.htwg.se.tiles.util.Observer
 
 import scala.util.Try
 
-class Tui(controller: Controller, var width: Int, var height: Int, var scale: Int, var offset: (Int, Int)) {
+class Tui(controller: Controller, var width: Int, var height: Int, var scale: Int, var offset: (Int, Int)) extends Observer[(Boolean, String)] {
 	require(scale >= 3)
 	require(width >= 1)
 	require(height >= 1)
 
 	var cursor: (Int, Int) = (0, 0)
+	var result = Option.empty[String]
 
 	def command(command: String): Option[String] = {
-		var result = Option.empty[String]
+		result = Option.empty[String]
 
 		command.replaceAll("\\W+", " ").trim() match {
 			case "w" => offset = offset.copy(_2 = offset._2 - 1)
@@ -38,38 +40,50 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 			case "place" => controller.commit()
 			case "t" =>
 				cursor = (cursor._1, cursor._2 - 1)
-				if (!controller.placeTile(cursor)._1) {
-					result = Option("OCCUPIED")
-				}
+				controller.placeTile(cursor)
 			case "g" =>
 				cursor = (cursor._1, cursor._2 + 1)
-				if (!controller.placeTile(cursor)._1) {
-					result = Option("OCCUPIED")
-				}
+				controller.placeTile(cursor)
 			case "f" =>
 				cursor = (cursor._1 - 1, cursor._2)
-				if (!controller.placeTile(cursor)._1) {
-					result = Option("OCCUPIED")
-				}
+				controller.placeTile(cursor)
 			case "h" =>
 				cursor = (cursor._1 + 1, cursor._2)
-				if (!controller.placeTile(cursor)._1) {
-					result = Option("OCCUPIED")
-				}
+				controller.placeTile(cursor)
 			case "q" | "r" =>
 				controller.rotate(false)
 			case "e" | "z" =>
 				controller.rotate(true)
 			case "cursor reset" =>
 				cursor = offset
-				if (!controller.placeTile(cursor)._1) {
-					result = Option("OCCUPIED")
-				}
+				controller.placeTile(cursor)
 
 			case _ => result = Option("Unknown command: " + command)
 		}
 		result
 	}
+
+	override def update(value: (Boolean, String)): Unit = {
+		print("\u001b[2J")
+		print(Console.BOLD)
+		print(Console.GREEN)
+
+		if (value._2 == "Already occupied") {
+			println(getView)
+		} else {
+			println(getView.split("\n").map(l => """>.*<|^[^>]*<|>[^<]*$""".r.replaceAllIn(l, m => Console.RED + m.matched + Console.GREEN)).mkString("\n"))
+		}
+		print(Console.RESET)
+		print(Console.UNDERLINED)
+		if (result.isDefined) {
+			println(result.get)
+		}
+		if (value._2.nonEmpty) {
+			println(value._2)
+		}
+		print(Console.RESET)
+	}
+
 
 	def getView: String =
 		controller.mapToString(offset, width, height, scale * 2, scale, Math.max(1, scale * .2).intValue, 2, frame = true, Option(cursor)) +

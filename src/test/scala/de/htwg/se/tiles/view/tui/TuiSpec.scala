@@ -55,20 +55,6 @@ class TuiSpec extends AnyWordSpec with Matchers {
 				tui.command("h").isEmpty shouldBe true
 				tui.cursor._1 shouldBe original.cursor._1
 			}
-			"move cursor (x/y) by 1 on 't', 'f', 'g', 'h' and return 'OCCUPIED'" in {
-				val board = Board(new HashMap().updated((0, 0), tile).updated((0, -1), tile).updated((-1, -1), tile).updated((-1, 0), tile))
-				val tui = new Tui(new Controller(board), width, height, scale, (0, 0))
-				val original = new Tui(new Controller(board), width, height, scale, (0, 0))
-
-				tui.command("t").get shouldBe "OCCUPIED"
-				tui.cursor._2 shouldBe original.cursor._2 - 1
-				tui.command("f").get shouldBe "OCCUPIED"
-				tui.cursor._1 shouldBe original.cursor._1 - 1
-				tui.command("g").get shouldBe "OCCUPIED"
-				tui.cursor._2 shouldBe original.cursor._2
-				tui.command("h").get shouldBe "OCCUPIED"
-				tui.cursor._1 shouldBe original.cursor._1
-			}
 			"set offset on 'position <x> <y>'" in {
 				val tui = new Tui(new Controller(Board()), width, height, scale, (0, 0))
 
@@ -78,13 +64,8 @@ class TuiSpec extends AnyWordSpec with Matchers {
 			"set cursor to offset on 'cursor reset'" in {
 				val tui = new Tui(new Controller(Board()), width, height, scale, (1, 10))
 
-				tui.command("cursor reset").isEmpty shouldBe true
-				tui.cursor shouldBe tui.offset
-			}
-			"set cursor to offset on 'cursor reset' and return 'OCCUPIED" in {
-				val tui = new Tui(new Controller(Board(new HashMap().updated((1, 10), tile))), width, height, scale, (1, 10))
 
-				tui.command("cursor reset").get shouldBe "OCCUPIED"
+				tui.command("cursor reset").isEmpty shouldBe true
 				tui.cursor shouldBe tui.offset
 			}
 			"get offset on 'position'" in {
@@ -179,6 +160,14 @@ class TuiSpec extends AnyWordSpec with Matchers {
 				tui.cursor = (1, 0)
 				tui.getView shouldBe controller.mapToString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option(1, 0)) + "\n" +
 					controller.currentTileToString(tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2).trim() + "\n\n"
+			}
+			"update" in {
+				val controller = new Controller(Board())
+				val tui = new Tui(controller, width, height, scale, (0, 0))
+
+				tui.command("size")
+				noException should be thrownBy tui.update((true, ""))
+				noException should be thrownBy tui.update((true, "Already occupied"))
 			}
 		}
 	}
