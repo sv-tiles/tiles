@@ -98,6 +98,17 @@ class BoardSpec extends AnyWordSpec with Matchers {
 				board3.placeCurrentTile((10, 10)) shouldBe board3.copy(tiles = board3.tiles.updated((10, 10), tile2), currentPos = Option((10, 10)), currentTile = Option.empty)
 			}
 		}
+		"pickup current tile" should {
+			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
+			val board1 = Board(new HashMap().updated((0, 0), tile), Option.empty, Option((0, 0)))
+			val board2 = Board(new HashMap(), Option(tile), Option.empty)
+			"throw if current tile not placed" in {
+				an[PlacementException] should be thrownBy board2.pickupCurrentTile()
+			}
+			"work" in {
+				board1.pickupCurrentTile() shouldBe board1.copy(tiles = board1.tiles.removed((0, 0)), currentPos = Option.empty, currentTile = Option(tile))
+			}
+		}
 		"rotate current tile" should {
 			val tile1 = Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
 			"rotate the tile" in {

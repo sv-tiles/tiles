@@ -24,6 +24,14 @@ case class Board(tiles: HashMap[(Int, Int), Tile] = new HashMap[(Int, Int), Tile
 		}
 	}
 
+	@throws[PlacementException]("Current tile not placed")
+	def pickupCurrentTile(): Board = {
+		if (currentPos.isEmpty) {
+			throw PlacementException("Current tile not placed")
+		}
+		copy(tiles = tiles.removed(currentPos.get), currentTile = Option(tiles(currentPos.get)), currentPos = Option.empty)
+	}
+
 	@throws[PlacementException]("Already occupied")
 	def place(pos: (Int, Int), tile: Tile): Board = {
 		if (tiles.contains(pos)) {

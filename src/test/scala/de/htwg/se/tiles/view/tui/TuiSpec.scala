@@ -169,6 +169,13 @@ class TuiSpec extends AnyWordSpec with Matchers {
 				noException should be thrownBy tui.update((true, ""))
 				noException should be thrownBy tui.update((true, "Already occupied"))
 			}
+			"reset board on 'clear'" in {
+				val controller = new Controller(Board(new HashMap().updated((10, 10), tile).updated((0, 0), tile)))
+				val tui = new Tui(controller, width, height, scale, (0, 0))
+
+				tui.command("clear")
+				controller.board shouldBe Board().copy(currentTile = controller.board.currentTile)
+			}
 		}
 	}
 

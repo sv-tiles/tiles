@@ -9,33 +9,19 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 	require(scale >= 3)
 	require(width >= 1)
 	require(height >= 1)
+	controller.add(this)
+
 
 	var cursor: (Int, Int) = (0, 0)
 	var result = Option.empty[String]
 
+	update((true, ""))
+
 	def command(command: String): Option[String] = {
 		result = Option.empty[String]
 
-		command.replaceAll("\\W+", " ").trim() match {
-			case "w" => offset = offset.copy(_2 = offset._2 - 1)
-			case "a" => offset = offset.copy(_1 = offset._1 - 1)
-			case "s" => offset = offset.copy(_2 = offset._2 + 1)
-			case "d" => offset = offset.copy(_1 = offset._1 + 1)
-			case s"position $x $y" if Try(x.toInt).isSuccess && Try(y.toInt).isSuccess =>
-				offset = (x.toInt, y.toInt)
-			case "position" => result = Option("Position: " + offset._1 + " " + offset._2)
-			case s"scale $f" if Try(f.toInt).isSuccess => scale = f.toInt
-			case "scale" => result = Option("Scale: " + scale)
-			case s"width $width" if Try(width.toInt).isSuccess => this.width = width.toInt
-			case "width" => result = Option("Width: " + width)
-			case s"height $height" if Try(height.toInt).isSuccess => this.height = height.toInt
-			case "height" => result = Option("Height: " + height)
-			case s"size $width $height" if Try(width.toInt).isSuccess && Try(height.toInt).isSuccess =>
-				this.width = width.toInt
-				this.height = height.toInt
-			case "size" => result = Option("Size: " + width + " " + height)
-			case "exit" => result = Option("stopping")
-
+		val cmd = command.replaceAll("\\W+", " ").trim()
+		cmd match {
 			case "clear" => controller.clear()
 			case "place" => controller.commit()
 			case "t" =>
@@ -57,9 +43,32 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 			case "cursor reset" =>
 				cursor = offset
 				controller.placeTile(cursor)
-
-			case _ => result = Option("Unknown command: " + command)
+			case _ =>
+				cmd match {
+					case "w" => offset = offset.copy(_2 = offset._2 - 1)
+					case "a" => offset = offset.copy(_1 = offset._1 - 1)
+					case "s" => offset = offset.copy(_2 = offset._2 + 1)
+					case "d" => offset = offset.copy(_1 = offset._1 + 1)
+					case s"position $x $y" if Try(x.toInt).isSuccess && Try(y.toInt).isSuccess =>
+						offset = (x.toInt, y.toInt)
+					case "position" => result = Option("Position: " + offset._1 + " " + offset._2)
+					case s"scale $f" if Try(f.toInt).isSuccess => scale = f.toInt
+					case "scale" => result = Option("Scale: " + scale)
+					case s"width $width" if Try(width.toInt).isSuccess => this.width = width.toInt
+					case "width" => result = Option("Width: " + width)
+					case s"height $height" if Try(height.toInt).isSuccess => this.height = height.toInt
+					case "height" => result = Option("Height: " + height)
+					case s"size $width $height" if Try(width.toInt).isSuccess && Try(height.toInt).isSuccess =>
+						this.width = width.toInt
+						this.height = height.toInt
+					case "size" => result = Option("Size: " + width + " " + height)
+					case "exit" => result = Option("stopping")
+					case _ => result = Option("Unknown command: " + command)
+				}
+				update((true, ""))
 		}
+
+
 		result
 	}
 
