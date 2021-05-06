@@ -23,6 +23,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			val controller = new Controller(board)
 			controller.placeTile((10, 10))
 			controller.board shouldBe board.placeCurrentTile((10, 10))
+			controller.placeTile((1, 1))
+			controller.placeTile((1, 1))
 		}
 		"rotate current tile" in {
 			val controller = new Controller(board)

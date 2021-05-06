@@ -17,6 +17,14 @@ class BoardSpec extends AnyWordSpec with Matchers {
 				board.boardToString shouldBe "empty"
 			}
 		}
+		"initialized" should {
+			"throw if current tile and pos are used" in {
+				an[IllegalArgumentException] should be thrownBy Board(new HashMap().updated((0, 0), Tile.random()), Option(Tile.random()), Option((0, 0)))
+			}
+			"throw if current pos is not occupied" in {
+				an[IllegalArgumentException] should be thrownBy Board(new HashMap(), Option.empty, Option((0, 0)))
+			}
+		}
 		"printed" should {
 			val offset = (0, 0)
 			val mapWidth = 50
