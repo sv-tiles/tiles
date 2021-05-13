@@ -4,7 +4,7 @@ import scala.collection.immutable.HashMap
 
 
 // @throws[IllegalArgumentException]
-case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](), currentTile: Option[Tile] = Option(Tile.random()), currentPos: Option[Position] = Option.empty) {
+case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](), currentTile: Option[Tile] = Option(TileBuilder.randomTile()), currentPos: Option[Position] = Option.empty) {
 	require(currentTile.isEmpty ^ currentPos.isEmpty, "current tile XOR current pos! (" + currentTile.isDefined + ", " + currentPos.isDefined + ")")
 	require(currentPos.isEmpty || tiles.contains(currentPos.get), "At current pos has to be a tile")
 
@@ -45,7 +45,7 @@ case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](),
 		if (currentPos.isEmpty) {
 			throw PlacementException("Tile not placed")
 		}
-		copy(currentPos = Option.empty, currentTile = Option(Tile.random()))
+		copy(currentPos = Option.empty, currentTile = Option(TileBuilder.randomTile()))
 	}
 
 	def boardToString: String = {

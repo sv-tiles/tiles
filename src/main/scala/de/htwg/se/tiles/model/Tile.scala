@@ -1,18 +1,9 @@
 package de.htwg.se.tiles.model
 
-import scala.util.Random
-
 object Tile {
 	def apply(all: Terrain): Tile = Tile(all, all, all, all, all)
 
 	def apply(center: Terrain, border: Terrain): Tile = Tile(border, border, border, border, center)
-
-	def random(seed: Long = System.currentTimeMillis()): Tile = {
-		Random.setSeed(seed)
-		val arr = Vector() ++ Terrain.defaults
-		val max = arr.size
-		Tile(arr(Random.nextInt(max)), arr(Random.nextInt(max)), arr(Random.nextInt(max)), arr(Random.nextInt(max)), arr(Random.nextInt(max)))
-	}
 }
 
 case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain) {

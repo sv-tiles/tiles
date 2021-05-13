@@ -19,7 +19,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 		}
 		"initialized" should {
 			"throw if current tile and pos are used" in {
-				an[IllegalArgumentException] should be thrownBy Board(new HashMap().updated(Position(0, 0), Tile.random()), Option(Tile.random()), Option(Position(0, 0)))
+				an[IllegalArgumentException] should be thrownBy Board(new HashMap().updated(Position(0, 0), TileBuilder.randomTile()), Option(TileBuilder.randomTile()), Option(Position(0, 0)))
 			}
 			"throw if current pos is not occupied" in {
 				an[IllegalArgumentException] should be thrownBy Board(new HashMap(), Option.empty, Option(Position(0, 0)))

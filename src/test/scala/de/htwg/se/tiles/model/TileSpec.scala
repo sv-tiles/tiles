@@ -72,9 +72,4 @@ class TileSpec extends AnyWordSpec with Matchers {
 			}
 		}
 	}
-	"A Tile" should {
-		"return a random tile on random" in {
-			noException should be thrownBy Tile.random()
-		}
-	}
 }

@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.control
 
-import de.htwg.se.tiles.model.{Board, Position, Tile}
+import de.htwg.se.tiles.model.{Board, Position, TileBuilder}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -9,10 +9,10 @@ import scala.collection.immutable.HashMap
 class ControllerSpec extends AnyWordSpec with Matchers {
 	"A controller" should {
 		val board = Board(new HashMap()
-			.updated(Position(0, 0), Tile.random())
-			.updated(Position(1, 0), Tile.random())
-			.updated(Position(0, 1), Tile.random())
-			.updated(Position(1, 1), Tile.random())
+			.updated(Position(0, 0), TileBuilder.randomTile())
+			.updated(Position(1, 0), TileBuilder.randomTile())
+			.updated(Position(0, 1), TileBuilder.randomTile())
+			.updated(Position(1, 1), TileBuilder.randomTile())
 		)
 		"clear board" in {
 			val controller = new Controller(board)
