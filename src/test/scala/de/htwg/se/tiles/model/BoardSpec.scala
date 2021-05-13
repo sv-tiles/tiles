@@ -8,6 +8,7 @@ import scala.collection.immutable.HashMap
 
 class BoardSpec extends AnyWordSpec with Matchers {
 	"A Board" when {
+		val validator = NoValidator()
 		"initialized without tiles" should {
 			val board = Board()
 			"be empty" in {
@@ -133,11 +134,18 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			val tile1 = Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
 			"throw exception if tile not placed" in {
 				val board = Board(new HashMap(), Option(tile1), Option.empty)
-				an[PlacementException] should be thrownBy board.commit()
+				an[PlacementException] should be thrownBy board.commit(validator)
+			}
+			"throw exception if not valid" in {
+				val board = Board(new HashMap()
+					.updated(Position(0, 0), Tile(Terrain.Plains))
+					.updated(Position(1, 0), Tile(Terrain.Mountains))
+					, Option.empty, Option(Position(1, 0)))
+				an[PlacementException] should be thrownBy board.commit(BasicValidator())
 			}
 			"generate a new current tile and discard current pos" in {
 				val board = Board(new HashMap().updated(Position(0, 0), tile1), Option.empty, Option(Position(0, 0)))
-				val committed = board.commit()
+				val committed = board.commit(validator)
 				committed shouldBe board.copy(currentPos = Option.empty, currentTile = committed.currentTile)
 				committed.currentTile should not be Option.empty
 			}

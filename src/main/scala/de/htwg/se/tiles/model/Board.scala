@@ -41,11 +41,15 @@ case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](),
 	}
 
 	@throws[PlacementException]("Tile not placed")
-	def commit(): Board = {
+	@throws[PlacementException]("Placement not valid")
+	def commit(validator: Validator): Board = {
 		if (currentPos.isEmpty) {
 			throw PlacementException("Tile not placed")
 		}
-		copy(currentPos = Option.empty, currentTile = Option(TileBuilder.randomTile()))
+		if (!validator.canPlace(this)) {
+			throw PlacementException("Placement not valid")
+		}
+		copy(currentPos = Option.empty, currentTile = Option(validator.randomPlaceable(this)))
 	}
 
 	def boardToString: String = {

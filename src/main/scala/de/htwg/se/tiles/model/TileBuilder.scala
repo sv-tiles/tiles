@@ -12,4 +12,13 @@ object TileBuilder {
 		val max = arr.size
 		Tile(arr(rand(max)), arr(rand(max)), arr(rand(max)), arr(rand(max)), arr(rand(max)))
 	}
+
+	def rotateRandom(tile: Tile, rotations: Int = rand(4)): Tile =
+		rotations match {
+			case 0 => tile
+			case 1 => tile.rotate(true)
+			case 2 => tile.rotate(true).rotate(true)
+			case 3 => tile.rotate(false)
+			case _ => throw new IllegalArgumentException()
+		}
 }

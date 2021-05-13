@@ -2,8 +2,8 @@ package de.htwg.se.tiles.model
 
 import scala.collection.immutable.HashMap
 
-case class BasicValidator() {
-	def canPlace(tile: Tile, tiles: HashMap[Position, Tile], at: Position): Boolean = {
+case class BasicValidator() extends Validator {
+	override def canPlace(tile: Tile, tiles: HashMap[Position, Tile], at: Position): Boolean = {
 		if (tiles.isEmpty) {
 			return true
 		}
@@ -38,14 +38,6 @@ case class BasicValidator() {
 		c > 0
 	}
 
-	@throws[IllegalArgumentException]("No tile to place")
-	def canPlace(b: Board): Boolean = {
-		if (b.currentPos.isEmpty) {
-			throw new IllegalArgumentException("No tile to place")
-		}
-		canPlace(b.tiles(b.currentPos.get), b.pickupCurrentTile().tiles, b.currentPos.get)
-	}
-
 	private def possiblePositions(b: Board): Set[Position] = b.tiles.keySet
 		.flatMap(pos => pos.neighbours().filter(p => !b.tiles.contains(p)))
 
@@ -55,5 +47,5 @@ case class BasicValidator() {
 		.copy(south = b.tiles.get(pos.south()).fold(tile.south)(t => t.north))
 		.copy(west = b.tiles.get(pos.west()).fold(tile.west)(t => t.east))
 
-	def randomPlaceable(b: Board): Tile = if (b.tiles.isEmpty) TileBuilder.randomTile() else makeFit(TileBuilder.randomTile(), b, possiblePositions(b).toVector(0))
+	override def randomPlaceable(b: Board): Tile = if (b.tiles.isEmpty) TileBuilder.randomTile() else TileBuilder.rotateRandom(makeFit(TileBuilder.randomTile(), b, possiblePositions(b).toVector(0)))
 }

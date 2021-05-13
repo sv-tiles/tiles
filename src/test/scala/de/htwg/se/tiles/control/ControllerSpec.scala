@@ -36,7 +36,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			val board2 = board.placeCurrentTile(Position(10, 10))
 			controller.placeTile((10, 10))
 			controller.commit()
-			controller.board shouldBe board2.commit().copy(currentTile = controller.board.currentTile)
+			controller.board shouldBe board2.commit(controller.validator).copy(currentTile = controller.board.currentTile)
 		}
 		"print map as string" in {
 			val controller = new Controller(board)
