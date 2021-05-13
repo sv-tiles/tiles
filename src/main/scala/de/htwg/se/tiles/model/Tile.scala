@@ -3,6 +3,10 @@ package de.htwg.se.tiles.model
 import scala.util.Random
 
 object Tile {
+	def apply(all: Terrain): Tile = Tile(all, all, all, all, all)
+
+	def apply(center: Terrain, border: Terrain): Tile = Tile(border, border, border, border, center)
+
 	def random(seed: Long = System.currentTimeMillis()): Tile = {
 		Random.setSeed(seed)
 		val arr = Vector() ++ Terrain.defaults
@@ -12,6 +16,7 @@ object Tile {
 }
 
 case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain) {
+
 	def rotate(clockwise: Boolean = true): Tile = if (clockwise)
 		copy(north = west, east = north, south = east, west = south) else
 		copy(north = east, east = south, south = west, west = north)

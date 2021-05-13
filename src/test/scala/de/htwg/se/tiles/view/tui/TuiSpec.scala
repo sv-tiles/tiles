@@ -1,7 +1,7 @@
 package de.htwg.se.tiles.view.tui
 
 import de.htwg.se.tiles.control.Controller
-import de.htwg.se.tiles.model.{Board, Terrain, Tile}
+import de.htwg.se.tiles.model.{Board, Position, Terrain, Tile}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -75,23 +75,23 @@ class TuiSpec extends AnyWordSpec with Matchers {
 			}
 			"rotate tiles on 'q' and 'r' counterclockwise" in {
 				val tile1 = Tile(Terrain.Plains, Terrain.Water, Terrain.Forest, Terrain.Hills, Terrain.Mountains)
-				val controller = new Controller(Board(new HashMap().updated((0, 0), tile1), Option.empty, Option(0, 0)))
+				val controller = new Controller(Board(new HashMap().updated(Position(0, 0), tile1), Option.empty, Option(Position(0, 0))))
 				val tui = new Tui(controller, width, height, scale, (0, 0))
 
 				tui.command("q").isEmpty shouldBe true
-				controller.board.tiles(0, 0) shouldBe tile1.rotate(false)
+				controller.board.tiles(Position(0, 0)) shouldBe tile1.rotate(false)
 				tui.command("r").isEmpty shouldBe true
-				controller.board.tiles(0, 0) shouldBe tile1.rotate(false).rotate(false)
+				controller.board.tiles(Position(0, 0)) shouldBe tile1.rotate(false).rotate(false)
 			}
 			"rotate tiles on 'e' and 'z' clockwise" in {
 				val tile1 = Tile(Terrain.Plains, Terrain.Water, Terrain.Forest, Terrain.Hills, Terrain.Mountains)
-				val controller = new Controller(Board(new HashMap().updated((0, 0), tile1), Option.empty, Option(0, 0)))
+				val controller = new Controller(Board(new HashMap().updated(Position(0, 0), tile1), Option.empty, Option(Position(0, 0))))
 				val tui = new Tui(controller, width, height, scale, (0, 0))
 
 				tui.command("e").isEmpty shouldBe true
-				controller.board.tiles(0, 0) shouldBe tile1.rotate(true)
+				controller.board.tiles(Position(0, 0)) shouldBe tile1.rotate(true)
 				tui.command("z").isEmpty shouldBe true
-				controller.board.tiles(0, 0) shouldBe tile1.rotate(true).rotate(true)
+				controller.board.tiles(Position(0, 0)) shouldBe tile1.rotate(true).rotate(true)
 			}
 			"set scale to 'f' on 'scale <f>" in {
 				val tui = new Tui(new Controller(Board()), width, height, scale, (0, 0))
@@ -170,7 +170,7 @@ class TuiSpec extends AnyWordSpec with Matchers {
 				noException should be thrownBy tui.update((true, "Already occupied"))
 			}
 			"reset board on 'clear'" in {
-				val controller = new Controller(Board(new HashMap().updated((10, 10), tile).updated((0, 0), tile)))
+				val controller = new Controller(Board(new HashMap().updated(Position(10, 10), tile).updated(Position(0, 0), tile)))
 				val tui = new Tui(controller, width, height, scale, (0, 0))
 
 				tui.command("clear")

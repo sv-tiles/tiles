@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.control
 
-import de.htwg.se.tiles.model.Board
+import de.htwg.se.tiles.model.{Board, Position}
 import de.htwg.se.tiles.util.Observable
 
 import scala.util.Try
@@ -13,7 +13,7 @@ class Controller(var board: Board = Board()) extends Observable[(Boolean, String
 	}
 
 	def placeTile(pos: (Int, Int)): Unit =
-		Try(board.placeCurrentTile(pos)).map(b => board = b).fold(e => {
+		Try(board.placeCurrentTile(Position(pos._1, pos._2))).map(b => board = b).fold(e => {
 			if (board.currentPos.isDefined) {
 				board = board.pickupCurrentTile()
 			}
@@ -29,7 +29,7 @@ class Controller(var board: Board = Board()) extends Observable[(Boolean, String
 		Try(board.commit()).map(b => board = b).fold(e => notifyObservers((false, e.getMessage)), _ => notifyObservers((true, "")))
 
 	def mapToString(offset: (Int, Int), mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[(Int, Int)] = Option.empty): String = {
-		board.boardToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame, highlight)
+		board.boardToString(Position(offset._1, offset._2), mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame, highlight.map(pos => Position(pos._1, pos._2)))
 	}
 
 	def currentTileToString(width: Int, height: Int, border: Int, margin: Int): String =

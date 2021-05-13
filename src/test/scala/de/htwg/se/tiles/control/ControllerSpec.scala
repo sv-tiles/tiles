@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.control
 
-import de.htwg.se.tiles.model.{Board, Tile}
+import de.htwg.se.tiles.model.{Board, Position, Tile}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -9,10 +9,10 @@ import scala.collection.immutable.HashMap
 class ControllerSpec extends AnyWordSpec with Matchers {
 	"A controller" should {
 		val board = Board(new HashMap()
-			.updated((0, 0), Tile.random())
-			.updated((1, 0), Tile.random())
-			.updated((0, 1), Tile.random())
-			.updated((1, 1), Tile.random())
+			.updated(Position(0, 0), Tile.random())
+			.updated(Position(1, 0), Tile.random())
+			.updated(Position(0, 1), Tile.random())
+			.updated(Position(1, 1), Tile.random())
 		)
 		"clear board" in {
 			val controller = new Controller(board)
@@ -22,7 +22,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 		"place tiles" in {
 			val controller = new Controller(board)
 			controller.placeTile((10, 10))
-			controller.board shouldBe board.placeCurrentTile((10, 10))
+			controller.board shouldBe board.placeCurrentTile(Position(10, 10))
 			controller.placeTile((1, 1))
 			controller.placeTile((1, 1))
 		}
@@ -33,7 +33,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 		}
 		"commit placed tile" in {
 			val controller = new Controller(board)
-			val board2 = board.placeCurrentTile((10, 10))
+			val board2 = board.placeCurrentTile(Position(10, 10))
 			controller.placeTile((10, 10))
 			controller.commit()
 			controller.board shouldBe board2.commit().copy(currentTile = controller.board.currentTile)
@@ -49,7 +49,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			val margin = 2
 			val frame = true
 
-			controller.mapToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame) shouldBe board.boardToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame)
+			controller.mapToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame) shouldBe board.boardToString(Position(offset._1, offset._2), mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame)
 		}
 		"print current tile as string" in {
 			val controller = new Controller(board)
