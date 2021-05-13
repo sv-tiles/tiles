@@ -6,9 +6,9 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import scala.collection.immutable.HashMap
 
-class ValidatorSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
-	"A Validator" should {
-		val validator = Validator()
+class BasicValidatorSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
+	"A BasicValidator" should {
+		val validator = BasicValidator()
 		val makeFit = PrivateMethod[Tile](Symbol("makeFit"))
 		val possiblePositions = PrivateMethod[Set[Position]](Symbol("possiblePositions"))
 

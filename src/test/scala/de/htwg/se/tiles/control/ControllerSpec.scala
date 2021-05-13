@@ -59,5 +59,17 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			val border = 2
 			controller.currentTileToString(width, height, border, margin) shouldBe board.currentTile.get.tileToString(width, height, border, margin)
 		}
+		"store and restore snapshots" in {
+			val controller = new Controller(board)
+			val snapshot = controller.toSnapshot
+
+			controller.board.currentPos.isEmpty shouldBe true
+
+			controller.placeTile((1, 10))
+
+			controller.board.currentPos.isDefined shouldBe true
+
+			controller.restoreSnapshot(snapshot).board.currentPos.isEmpty shouldBe true
+		}
 	}
 }

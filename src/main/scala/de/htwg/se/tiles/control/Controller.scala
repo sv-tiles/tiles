@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.control
 
-import de.htwg.se.tiles.model.{Board, Position}
+import de.htwg.se.tiles.model.{Board, GameSnapshot, Position}
 import de.htwg.se.tiles.util.Observable
 
 import scala.util.Try
@@ -34,4 +34,11 @@ class Controller(var board: Board = Board()) extends Observable[(Boolean, String
 
 	def currentTileToString(width: Int, height: Int, border: Int, margin: Int): String =
 		board.currentTile.map[String](t => t.tileToString(width, height, border, margin)).getOrElse("Tile placed")
+
+	def toSnapshot: GameSnapshot = GameSnapshot(board)
+
+	def restoreSnapshot(snapshot: GameSnapshot): Controller = {
+		board = snapshot.board
+		this
+	}
 }
