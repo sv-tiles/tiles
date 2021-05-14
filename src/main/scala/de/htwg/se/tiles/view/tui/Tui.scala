@@ -15,41 +15,42 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 	var cursor: (Int, Int) = (0, 0)
 	var result = Option.empty[String]
 
-	private val commandHandlers: CommandHandler = (command: String) => if (command == "clear") {
-		controller.clear()
-		true
-	} else false
+	private val commandHandlers: CommandHandler = new CommandHandler("clear") {
+		override def handleSelf(command: String): Unit = controller.clear()
+	}
 
-	commandHandlers.appendHandler((command: String) => if (command == "place" || command == "u") {
-		controller.commit()
-		true
-	} else false).appendHandler((command: String) => if (command == "t") {
-		cursor = (cursor._1, cursor._2 - 1)
-		controller.placeTile(cursor)
-		true
-	} else false).appendHandler((command: String) => if (command == "g") {
-		cursor = (cursor._1, cursor._2 + 1)
-		controller.placeTile(cursor)
-		true
-	} else false).appendHandler((command: String) => if (command == "f") {
-		cursor = (cursor._1 - 1, cursor._2)
-		controller.placeTile(cursor)
-		true
-	} else false).appendHandler((command: String) => if (command == "h") {
-		cursor = (cursor._1 + 1, cursor._2)
-		controller.placeTile(cursor)
-		true
-	} else false).appendHandler((command: String) => if (command == "q" || command == "r") {
-		controller.rotate(false)
-		true
-	} else false).appendHandler((command: String) => if (command == "e" || command == "z") {
-		controller.rotate(true)
-		true
-	} else false).appendHandler((command: String) => if (command == "cursor reset") {
-		cursor = offset
-		controller.placeTile(cursor)
-		true
-	} else false)
+	commandHandlers.appendHandler(new CommandHandler("place", "u") {
+		override def handleSelf(command: String): Unit = controller.commit()
+	}).appendHandler(new CommandHandler("t") {
+		override def handleSelf(command: String): Unit = {
+			cursor = (cursor._1, cursor._2 - 1)
+			controller.placeTile(cursor)
+		}
+	}).appendHandler(new CommandHandler("g") {
+		override def handleSelf(command: String): Unit = {
+			cursor = (cursor._1, cursor._2 + 1)
+			controller.placeTile(cursor)
+		}
+	}).appendHandler(new CommandHandler("f") {
+		override def handleSelf(command: String): Unit = {
+			cursor = (cursor._1 - 1, cursor._2)
+			controller.placeTile(cursor)
+		}
+	}).appendHandler(new CommandHandler("h") {
+		override def handleSelf(command: String): Unit = {
+			cursor = (cursor._1 + 1, cursor._2)
+			controller.placeTile(cursor)
+		}
+	}).appendHandler(new CommandHandler("q", "r") {
+		override def handleSelf(command: String): Unit = controller.rotate(false)
+	}).appendHandler(new CommandHandler("e", "z") {
+		override def handleSelf(command: String): Unit = controller.rotate(true)
+	}).appendHandler(new CommandHandler("cursor reset") {
+		override def handleSelf(command: String): Unit = {
+			cursor = offset
+			controller.placeTile(cursor)
+		}
+	})
 
 	update((true, ""))
 

@@ -1,16 +1,17 @@
 package de.htwg.se.tiles.view.tui
 
-trait CommandHandler {
+abstract class CommandHandler(commands: String*) {
 	private var nextHandler: Option[CommandHandler] = None
 
 	final def handleCommand(command: String): Boolean = {
-		if (!handleSelf(command)) {
-			return nextHandler.fold(false)(h => h.handleCommand(command))
+		if (commands.contains(command)) {
+			handleSelf(command)
+			return true
 		}
-		true
+		nextHandler.fold(false)(h => h.handleCommand(command))
 	}
 
-	def handleSelf(command: String): Boolean
+	def handleSelf(command: String): Unit
 
 	final def appendHandler(handler: CommandHandler): CommandHandler = {
 		nextHandler = Option(handler)
