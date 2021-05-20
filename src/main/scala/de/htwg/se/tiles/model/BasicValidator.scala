@@ -10,6 +10,12 @@ case class BasicValidator() extends Validator {
 		if (tiles.contains(at)) {
 			return false
 		}
+
+		val check = at.neighbours()
+			.filter(p => tiles.contains(p))
+			.map(p => tiles(p).getTerrainAt(p.directionOfNeighbour(at).get).get == tile.getTerrainAt(at.directionOfNeighbour(p).get).get)
+		check.forall(b => b) && check.nonEmpty
+		/*
 		var c = 0;
 		if (tiles.contains(at.west())) {
 			c += 1
@@ -36,6 +42,7 @@ case class BasicValidator() extends Validator {
 			}
 		}
 		c > 0
+		*/
 	}
 
 	private def possiblePositions(b: Board): Set[Position] = b.tiles.keySet

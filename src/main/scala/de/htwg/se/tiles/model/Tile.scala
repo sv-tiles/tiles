@@ -1,5 +1,9 @@
 package de.htwg.se.tiles.model
 
+import de.htwg.se.tiles.model.Direction.{East, North, South, West}
+
+import scala.util.{Failure, Success, Try}
+
 object Tile {
 	def apply(all: Terrain): Tile = Tile(all, all, all, all, all)
 
@@ -36,4 +40,12 @@ case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, ce
 		(for (i <- 0 until height) yield printLine(i, width, height, border, margin)).mkString("\n")
 
 	override def toString: String = center.symbol
+
+	def getTerrainAt(direction: Direction): Try[Terrain] = direction match {
+		case North => Success(north)
+		case East => Success(east)
+		case South => Success(south)
+		case West => Success(west)
+		case _ => Failure(new IllegalArgumentException())
+	}
 }
