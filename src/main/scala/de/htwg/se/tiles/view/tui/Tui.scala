@@ -14,6 +14,7 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 
 	var cursor: (Int, Int) = (0, 0)
 	var result = Option.empty[String]
+	var last: (Boolean, String) = (true, "")
 
 	private val commandHandlers: CommandHandler = new CommandHandler("clear") {
 		override def handleSelf(command: String): Unit = controller.clear()
@@ -49,6 +50,18 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 		override def handleSelf(command: String): Unit = {
 			cursor = offset
 			controller.placeTile(cursor)
+		}
+	}).appendHandler(new CommandHandler("undo") {
+		override def handleSelf(command: String): Unit = {
+			controller.undo()
+			controller.board.currentPos.foreach(p => cursor = (p.x, p.y))
+			update(last)
+		}
+	}).appendHandler(new CommandHandler("redo") {
+		override def handleSelf(command: String): Unit = {
+			controller.redo()
+			controller.board.currentPos.foreach(p => cursor = (p.x, p.y))
+			update(last)
 		}
 	})
 
@@ -88,6 +101,7 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 	}
 
 	override def update(value: (Boolean, String)): Unit = {
+		last = value
 		print("\u001b[2J")
 		print(Console.BOLD)
 		print(Console.GREEN)

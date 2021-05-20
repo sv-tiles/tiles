@@ -2,7 +2,7 @@ package de.htwg.se.tiles.model
 
 import de.htwg.se.tiles.model.Direction.{East, North, South, West}
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 object Tile {
 	def apply(all: Terrain): Tile = Tile(all, all, all, all, all)
@@ -46,6 +46,5 @@ case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, ce
 		case East => Success(east)
 		case South => Success(south)
 		case West => Success(west)
-		case _ => Failure(new IllegalArgumentException())
 	}
 }

@@ -1,10 +1,12 @@
 package de.htwg.se.tiles.control
 
 import de.htwg.se.tiles.model.{Board, Position, TileBuilder}
+import de.htwg.se.tiles.util.Command
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import scala.collection.immutable.HashMap
+import scala.util.{Failure, Try}
 
 class ControllerSpec extends AnyWordSpec with Matchers {
 	"A controller" should {
@@ -71,5 +73,54 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
 			controller.restoreSnapshot(snapshot).board.currentPos.isEmpty shouldBe true
 		}
+		"correctly undo redo" in {
+			val controller = new Controller()
+
+			val board = controller.board
+
+			controller.placeTile((0, 0))
+
+			val board2 = controller.board
+
+			board should not be board2
+
+			controller.undo()
+
+			controller.board shouldBe board
+
+			controller.redo()
+
+			controller.board shouldBe board2
+
+			controller.commit()
+
+			controller.undo()
+
+			controller.redo()
+
+			controller.clear()
+
+			controller.undo()
+
+			controller.redo()
+
+			controller.rotate(true)
+
+			controller.undo()
+
+			controller.redo()
+
+			controller.undoManager.execute(new TestErrorUndoCommand())
+
+			controller.undo()
+
+			controller.redo()
+		}
 	}
+}
+
+class TestErrorUndoCommand extends Command {
+	override def execute(): Try[_] = Failure(new RuntimeException("Test"))
+
+	override def undo(): Try[_] = Failure(new RuntimeException("Test"))
 }
