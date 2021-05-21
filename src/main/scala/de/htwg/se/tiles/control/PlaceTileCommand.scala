@@ -3,7 +3,7 @@ package de.htwg.se.tiles.control
 import de.htwg.se.tiles.model.{Board, Position}
 import de.htwg.se.tiles.util.Command
 
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 class PlaceTileCommand(controller: Controller, pos: (Int, Int)) extends Command {
 	private var board: Board = controller.board
@@ -16,7 +16,7 @@ class PlaceTileCommand(controller: Controller, pos: (Int, Int)) extends Command 
 					board = b
 				})
 			}
-			Try(throw e)
+			Failure(e)
 		})
 
 	override def undo(): Try[_] = Success(controller.board = board)

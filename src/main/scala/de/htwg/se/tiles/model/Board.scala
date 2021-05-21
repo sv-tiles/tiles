@@ -1,7 +1,7 @@
 package de.htwg.se.tiles.model
 
 import scala.collection.immutable.HashMap
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 
 // @throws[IllegalArgumentException]
@@ -23,26 +23,26 @@ case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](),
 		}
 	}
 
-	def pickupCurrentTile(): Try[Board] = Try({
+	def pickupCurrentTile(): Try[Board] = Try {
 		if (currentPos.isEmpty) {
-			throw PlacementException("Current tile not placed")
+			return Failure(PlacementException("Current tile not placed"))
 		}
 		copy(tiles = tiles.removed(currentPos.get), currentTile = Option(tiles(currentPos.get)), currentPos = Option.empty)
-	})
+	}
 
-	def place(pos: Position, tile: Tile): Try[Board] = Try({
+	def place(pos: Position, tile: Tile): Try[Board] = Try {
 		if (tiles.contains(pos)) {
-			throw PlacementException("Already occupied")
+			return Failure(PlacementException("Already occupied"))
 		}
 		copy(tiles.updated(pos, tile))
-	})
+	}
 
-	def commit(validator: Validator): Try[Board] = validator.canPlace(this).flatMap(canPlace => Try({
+	def commit(validator: Validator): Try[Board] = validator.canPlace(this).flatMap(canPlace => Try {
 		if (!canPlace) {
-			throw PlacementException("Placement not valid")
+			return Failure(PlacementException("Placement not valid"))
 		}
 		copy(currentPos = Option.empty, currentTile = Option(validator.randomPlaceable(this)))
-	}))
+	})
 
 	def boardToString: String = {
 		if (tiles.isEmpty) {
@@ -59,7 +59,7 @@ case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](),
 		boardToString(off, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame = false).get
 	}
 
-	def boardToString(offset: Position, mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[Position] = Option.empty): Try[String] = Try({
+	def boardToString(offset: Position, mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[Position] = Option.empty): Try[String] = Try {
 		require(mapWidth > 0)
 		require(mapHeight > 0)
 		if (highlight.isDefined) {
@@ -91,5 +91,5 @@ case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](),
 			.grouped(mapHeight).next().mkString
 
 		(if (frame) "+" + "-" * mapWidth + "+\n" else "") + text + (if (frame) "+" + "-" * mapWidth + "+" else "")
-	})
+	}
 }
