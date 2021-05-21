@@ -19,11 +19,11 @@ class TileBuilderSpec extends AnyWordSpec with Matchers with PrivateMethodTester
 		"rotate tiles" in {
 			val tile = Tile(Terrain.Plains, Terrain.Hills, Terrain.Forest, Terrain.Water, Terrain.Mountains)
 
-			TileBuilder.rotateRandom(tile, 0) shouldBe tile
-			TileBuilder.rotateRandom(tile, 1) shouldBe tile.rotate()
-			TileBuilder.rotateRandom(tile, 2) shouldBe tile.rotate().rotate()
-			TileBuilder.rotateRandom(tile, 3) shouldBe tile.rotate().rotate().rotate()
-			an[IllegalArgumentException] should be thrownBy TileBuilder.rotateRandom(tile, -1)
+			TileBuilder.rotateRandom(tile, 0).get shouldBe tile
+			TileBuilder.rotateRandom(tile, 1).get shouldBe tile.rotate()
+			TileBuilder.rotateRandom(tile, 2).get shouldBe tile.rotate().rotate()
+			TileBuilder.rotateRandom(tile, 3).get shouldBe tile.rotate().rotate().rotate()
+			TileBuilder.rotateRandom(tile, -1).isFailure shouldBe true
 		}
 	}
 }

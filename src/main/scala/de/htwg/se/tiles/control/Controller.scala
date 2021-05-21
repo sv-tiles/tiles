@@ -3,6 +3,8 @@ package de.htwg.se.tiles.control
 import de.htwg.se.tiles.model._
 import de.htwg.se.tiles.util.{Observable, UndoManager}
 
+import scala.util.{Success, Try}
+
 
 class Controller(var board: Board = Board(), var validator: Validator = NoValidator(), var undoManager: UndoManager = new UndoManager()) extends Observable[(Boolean, String)] {
 
@@ -14,7 +16,7 @@ class Controller(var board: Board = Board(), var validator: Validator = NoValida
 	def placeTile(pos: (Int, Int)): Unit =
 		undoManager.execute(new PlaceTileCommand(this, pos)).fold(
 			e => notifyObservers((false, e.getMessage)),
-			_ => notifyObservers((true, ""))
+			a => notifyObservers((true, ""))
 		)
 
 	def rotate(clockwise: Boolean): Unit = {
@@ -28,12 +30,11 @@ class Controller(var board: Board = Board(), var validator: Validator = NoValida
 			_ => notifyObservers((true, ""))
 		)
 
-	def mapToString(offset: (Int, Int), mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[(Int, Int)] = Option.empty): String = {
-		board.boardToString(Position(offset._1, offset._2), mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame, highlight.map(pos => Position(pos._1, pos._2)))
-	}
+	def mapToString(offset: (Int, Int), mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[(Int, Int)] = Option.empty): String =
+		board.boardToString(Position(offset._1, offset._2), mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame, highlight.map(pos => Position(pos._1, pos._2))).recover(e => e.getMessage).get
 
-	def currentTileToString(width: Int, height: Int, border: Int, margin: Int): String =
-		board.currentTile.map[String](t => t.tileToString(width, height, border, margin)).getOrElse("Tile placed")
+	def currentTileToString(width: Int, height: Int, border: Int, margin: Int): Try[String] =
+		board.currentTile.map[Try[String]](t => t.tileToString(width, height, border, margin)).getOrElse(Success("Tile placed"))
 
 	def toSnapshot: GameSnapshot = GameSnapshot(board)
 

@@ -24,7 +24,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 		"place tiles" in {
 			val controller = new Controller(board)
 			controller.placeTile((10, 10))
-			controller.board shouldBe board.placeCurrentTile(Position(10, 10))
+			controller.board shouldBe board.placeCurrentTile(Position(10, 10)).get
+
 			controller.placeTile((1, 1))
 			controller.placeTile((1, 1))
 		}
@@ -35,10 +36,10 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 		}
 		"commit placed tile" in {
 			val controller = new Controller(board)
-			val board2 = board.placeCurrentTile(Position(10, 10))
+			val board2 = board.placeCurrentTile(Position(10, 10)).get
 			controller.placeTile((10, 10))
 			controller.commit()
-			controller.board shouldBe board2.commit(controller.validator).copy(currentTile = controller.board.currentTile)
+			controller.board shouldBe board2.commit(controller.validator).get.copy(currentTile = controller.board.currentTile)
 		}
 		"print map as string" in {
 			val controller = new Controller(board)
@@ -51,7 +52,20 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			val margin = 2
 			val frame = true
 
-			controller.mapToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame) shouldBe board.boardToString(Position(offset._1, offset._2), mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame)
+			controller.mapToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame) shouldBe board.boardToString(Position(offset._1, offset._2), mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame).get
+		}
+		"fail to print map as string if invalid" in {
+			val controller = new Controller(board)
+			val offset = (0, 0)
+			val mapWidth = 0
+			val mapHeight = 0
+			val tileWidth = 0
+			val tileHeight = 5
+			val border = 2
+			val margin = 2
+			val frame = true
+
+			controller.mapToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame) shouldBe "requirement failed"
 		}
 		"print current tile as string" in {
 			val controller = new Controller(board)

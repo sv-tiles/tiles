@@ -156,10 +156,10 @@ class TuiSpec extends AnyWordSpec with Matchers {
 				val tui = new Tui(controller, width, height, scale, (0, 0))
 
 				tui.getView shouldBe controller.mapToString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option(tui.cursor)) + "\n" +
-					controller.currentTileToString(tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2).trim() + "\n\n"
+					controller.currentTileToString(tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2).get.trim() + "\n\n"
 				tui.cursor = (1, 0)
 				tui.getView shouldBe controller.mapToString(tui.offset, tui.width, tui.height, tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2, true, Option(1, 0)) + "\n" +
-					controller.currentTileToString(tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2).trim() + "\n\n"
+					controller.currentTileToString(tui.scale * 2, tui.scale, Math.max(1, tui.scale * .2).intValue, 2).get.trim() + "\n\n"
 			}
 			"update" in {
 				val controller = new Controller(Board())

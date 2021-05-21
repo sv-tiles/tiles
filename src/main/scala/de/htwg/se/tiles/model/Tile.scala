@@ -17,7 +17,7 @@ case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, ce
 		copy(north = east, east = south, south = west, west = north)
 
 	@throws[IllegalArgumentException]
-	def printLine(line: Int, width: Int, height: Int, border: Int, margin: Int): String = {
+	def printLine(line: Int, width: Int, height: Int, border: Int, margin: Int): Try[String] = Try({
 		require(line >= 0 && line < height + margin / 2, "line out of bounds")
 		require(width >= 3, "width too small")
 		require(height >= 3, "height too small")
@@ -34,10 +34,10 @@ case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, ce
 		} else {
 			west.symbol * border + center.symbol * (width - (2 * border)) + east.symbol * border + " " * margin
 		}
-	}
+	})
 
-	def tileToString(width: Int, height: Int, border: Int, margin: Int): String =
-		(for (i <- 0 until height) yield printLine(i, width, height, border, margin)).mkString("\n")
+	def tileToString(width: Int, height: Int, border: Int, margin: Int): Try[String] =
+		Try((for (i <- 0 until height) yield printLine(i, width, height, border, margin).get).mkString("\n"))
 
 	override def toString: String = center.symbol
 

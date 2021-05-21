@@ -46,8 +46,8 @@ class BasicValidatorSpec extends AnyWordSpec with Matchers with PrivateMethodTes
 			validator.canPlace(tile.copy(south = Terrain.Mountains), board.tiles, pos) shouldBe false
 			validator.canPlace(tile.copy(west = Terrain.Mountains), board.tiles, pos) shouldBe false
 
-			an[IllegalArgumentException] should be thrownBy validator.canPlace(board)
-			validator.canPlace(board.copy(currentTile = Option(tile)).placeCurrentTile(pos)) shouldBe true
+			validator.canPlace(board).isFailure shouldBe true
+			validator.canPlace(board.copy(currentTile = Option(tile)).placeCurrentTile(pos).get).get shouldBe true
 		}
 		"return random placeable tiles" in {
 			noException should be thrownBy validator.randomPlaceable(Board())

@@ -125,6 +125,6 @@ class Tui(controller: Controller, var width: Int, var height: Int, var scale: In
 
 	def getView: String =
 		controller.mapToString(offset, width, height, scale * 2, scale, Math.max(1, scale * .2).intValue, 2, frame = true, Option(cursor)) +
-			"\n" + controller.currentTileToString(scale * 2, scale, Math.max(1, scale * .2).intValue, 2).trim() + "\n\n"
+			"\n" + controller.currentTileToString(scale * 2, scale, Math.max(1, scale * .2).intValue, 2).fold[String](_ => "Error", s => s.trim()) + "\n\n"
 
 }

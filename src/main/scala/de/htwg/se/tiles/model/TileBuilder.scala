@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.model
 
-import scala.util.Random
+import scala.util.{Random, Try}
 
 object TileBuilder {
 	private var rand = (max: Int) => Random.nextInt(max)
@@ -13,12 +13,12 @@ object TileBuilder {
 		Tile(arr(rand(max)), arr(rand(max)), arr(rand(max)), arr(rand(max)), arr(rand(max)))
 	}
 
-	def rotateRandom(tile: Tile, rotations: Int = rand(4)): Tile =
+	def rotateRandom(tile: Tile, rotations: Int = rand(4)): Try[Tile] = Try(
 		rotations match {
 			case 0 => tile
 			case 1 => tile.rotate(true)
 			case 2 => tile.rotate(true).rotate(true)
 			case 3 => tile.rotate(false)
 			case _ => throw new IllegalArgumentException()
-		}
+		})
 }

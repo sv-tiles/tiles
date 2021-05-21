@@ -54,5 +54,5 @@ case class BasicValidator() extends Validator {
 		.copy(south = b.tiles.get(pos.south()).fold(tile.south)(t => t.north))
 		.copy(west = b.tiles.get(pos.west()).fold(tile.west)(t => t.east))
 
-	override def randomPlaceable(b: Board): Tile = if (b.tiles.isEmpty) TileBuilder.randomTile() else TileBuilder.rotateRandom(makeFit(TileBuilder.randomTile(), b, possiblePositions(b).toVector(0)))
+	override def randomPlaceable(b: Board): Tile = if (b.tiles.isEmpty) TileBuilder.randomTile() else TileBuilder.rotateRandom(makeFit(TileBuilder.randomTile(), b, possiblePositions(b).toVector(0))).get
 }
