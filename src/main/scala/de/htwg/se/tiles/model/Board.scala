@@ -1,5 +1,7 @@
 package de.htwg.se.tiles.model
 
+import de.htwg.se.tiles.model.rules.Rules
+
 import scala.collection.immutable.HashMap
 import scala.util.{Failure, Success, Try}
 
@@ -37,11 +39,11 @@ case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](),
 		copy(tiles.updated(pos, tile))
 	}
 
-	def commit(validator: Validator): Try[Board] = validator.canPlace(this).flatMap(canPlace => Try {
+	def commit(rules: Rules): Try[Board] = rules.canPlace(this).flatMap(canPlace => Try {
 		if (!canPlace) {
 			return Failure(PlacementException("Placement not valid"))
 		}
-		copy(currentPos = Option.empty, currentTile = Option(validator.randomPlaceable(this)))
+		copy(currentPos = Option.empty, currentTile = Option(rules.randomPlaceable(this)))
 	})
 
 	def boardToString: String = {

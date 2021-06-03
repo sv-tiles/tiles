@@ -1,8 +1,10 @@
-package de.htwg.se.tiles.model
+package de.htwg.se.tiles.model.rules
+
+import de.htwg.se.tiles.model.{Board, Position, Tile, TileBuilder}
 
 import scala.collection.immutable.HashMap
 
-case class BasicValidator() extends Validator {
+case class BasicRules() extends Rules {
 	override def canPlace(tile: Tile, tiles: HashMap[Position, Tile], at: Position): Boolean = {
 		if (tiles.isEmpty) {
 			return true

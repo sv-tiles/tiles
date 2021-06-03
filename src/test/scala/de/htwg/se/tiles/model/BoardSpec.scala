@@ -1,5 +1,6 @@
 package de.htwg.se.tiles.model
 
+import de.htwg.se.tiles.model.rules.{BasicRules, NoRules}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -8,7 +9,7 @@ import scala.collection.immutable.HashMap
 
 class BoardSpec extends AnyWordSpec with Matchers {
 	"A Board" when {
-		val validator = NoValidator()
+		val rules = NoRules()
 		"initialized without tiles" should {
 			val board = Board()
 			"be empty" in {
@@ -134,18 +135,18 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			val tile1 = Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
 			"fail if tile not placed" in {
 				val board = Board(new HashMap(), Option(tile1), Option.empty)
-				board.commit(validator).isFailure shouldBe true
+				board.commit(rules).isFailure shouldBe true
 			}
 			"fail if not valid" in {
 				val board = Board(new HashMap()
 					.updated(Position(0, 0), Tile(Terrain.Plains))
 					.updated(Position(1, 0), Tile(Terrain.Mountains))
 					, Option.empty, Option(Position(1, 0)))
-				board.commit(BasicValidator()).isFailure shouldBe true
+				board.commit(BasicRules()).isFailure shouldBe true
 			}
 			"generate a new current tile and discard current pos" in {
 				val board = Board(new HashMap().updated(Position(0, 0), tile1), Option.empty, Option(Position(0, 0)))
-				val committed = board.commit(validator).get
+				val committed = board.commit(rules).get
 				committed shouldBe board.copy(currentPos = Option.empty, currentTile = committed.currentTile)
 				committed.currentTile should not be Option.empty
 			}

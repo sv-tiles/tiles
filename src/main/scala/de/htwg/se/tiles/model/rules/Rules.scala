@@ -1,9 +1,11 @@
-package de.htwg.se.tiles.model
+package de.htwg.se.tiles.model.rules
+
+import de.htwg.se.tiles.model.{Board, Position, Tile}
 
 import scala.collection.immutable.HashMap
 import scala.util.{Failure, Try}
 
-trait Validator {
+trait Rules {
 	def canPlace(tile: Tile, tiles: HashMap[Position, Tile], at: Position): Boolean
 
 	// @throws[IllegalArgumentException]("No tile to place")

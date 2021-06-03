@@ -1,12 +1,13 @@
 package de.htwg.se.tiles.control
 
 import de.htwg.se.tiles.model._
+import de.htwg.se.tiles.model.rules.{NoRules, Rules}
 import de.htwg.se.tiles.util.{Observable, UndoManager}
 
 import scala.util.{Success, Try}
 
 
-class Controller(var board: Board = Board(), var validator: Validator = NoValidator(), var undoManager: UndoManager = new UndoManager()) extends Observable[(Boolean, String)] {
+class Controller(var board: Board = Board(), var rules: Rules = NoRules(), var undoManager: UndoManager = new UndoManager()) extends Observable[(Boolean, String)] {
 
 	def clear(): Unit = {
 		undoManager.execute(new ClearCommand(this))
@@ -25,7 +26,7 @@ class Controller(var board: Board = Board(), var validator: Validator = NoValida
 	}
 
 	def commit(): Unit =
-		undoManager.execute(new CommitCommand(this, validator)).fold(
+		undoManager.execute(new CommitCommand(this, rules)).fold(
 			e => notifyObservers((false, e.getMessage)),
 			_ => notifyObservers((true, ""))
 		)
