@@ -11,7 +11,7 @@ class GameSpec extends AnyWordSpec with Matchers {
 			"run  without exceptions" in {
 				val in = new ByteArrayInputStream("?\nplace\nh\nf\nplace\nh\ng\nf\nundo\nredo\nexit\n".getBytes)
 				Console.withIn(in) {
-					noException should be thrownBy Game.main(Array())
+					noException should be thrownBy Game.main(Array("--test"))
 				}
 			}
 		}
