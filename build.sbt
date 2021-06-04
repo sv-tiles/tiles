@@ -22,3 +22,5 @@ lazy val javaFXModules = {
 }
 
 libraryDependencies ++= javaFXModules
+
+Compile / resourceDirectory := baseDirectory.value / "src/main/resources"

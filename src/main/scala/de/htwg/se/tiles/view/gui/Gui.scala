@@ -6,9 +6,10 @@ import de.htwg.se.tiles.util.{Observer, Position2D}
 import scalafx.application.{JFXApp3, Platform}
 import scalafx.scene.control.{Button, Menu, MenuBar, MenuItem}
 import scalafx.scene.input.MouseButton
-import scalafx.scene.layout.{BorderPane, Pane}
+import scalafx.scene.layout.{BorderPane, Pane, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Polygon, Polyline, Rectangle, Shape}
+import scalafx.scene.text.Text
 import scalafx.scene.{Group, Scene}
 
 
@@ -21,7 +22,7 @@ class Gui(val controller: Controller) extends JFXApp3 with Observer[(Boolean, St
 		style = "-fx-background-color: rgb(50,50,50)"
 	}
 
-	private val info = new Menu("-")
+	private val info = new Text("-")
 	private var infoTime = 0L
 
 	override def start(): Unit = {
@@ -30,7 +31,9 @@ class Gui(val controller: Controller) extends JFXApp3 with Observer[(Boolean, St
 			width = 800
 			height = 500
 			scene = new Scene {
+				stylesheets.add(getClass.getResource("style.css").toString)
 				root = new BorderPane {
+					style = "-fx-background-color: rgb(100,100,100)"
 					center = pane
 					top = new MenuBar {
 						menus = List(new Menu("Game") {
@@ -38,7 +41,17 @@ class Gui(val controller: Controller) extends JFXApp3 with Observer[(Boolean, St
 								onAction = e => controller.clear()
 							})
 						})
-						menus.add(info)
+					}
+					bottom = info
+					left = new VBox {
+						children = List(
+							new Button("undo") {
+								onAction = e => controller.undo()
+							},
+							new Button("redo") {
+								onAction = e => controller.redo()
+							}
+						)
 					}
 				}
 				private var anchor = Position2D(0d, 0d)
