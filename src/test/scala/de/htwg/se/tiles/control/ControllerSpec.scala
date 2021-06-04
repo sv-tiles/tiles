@@ -1,5 +1,6 @@
 package de.htwg.se.tiles.control
 
+import de.htwg.se.tiles.model.rules.BasicRules
 import de.htwg.se.tiles.model.{Board, Position, TileBuilder}
 import de.htwg.se.tiles.util.Command
 import org.scalatest.matchers.should.Matchers
@@ -141,6 +142,28 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			controller.redo()
 
 			controller.undoManager.execute(new TestErrorUndoCommand())
+
+			controller.undo()
+
+			controller.redo()
+
+		}
+		"reproduce commit error on undo/redo" in {
+			val controller = new Controller(Board().place(Position(0, 0), TileBuilder.randomTile()).get, BasicRules())
+
+			controller.placeTile((1, 1))
+
+			controller.board.currentPos.get shouldBe Position(1, 1)
+
+			controller.commit()
+
+			controller.board.currentPos.isDefined shouldBe true
+
+			controller.undo()
+
+			controller.redo()
+
+			controller.board.currentPos.isDefined shouldBe true
 
 			controller.undo()
 
