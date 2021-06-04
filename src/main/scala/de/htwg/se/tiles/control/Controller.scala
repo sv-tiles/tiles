@@ -20,6 +20,12 @@ class Controller(var board: Board = Board(), var rules: Rules = NoRules(), var u
 			a => notifyObservers((true, ""))
 		)
 
+	def pickUpTile(): Unit =
+		undoManager.execute(new PickUpTileCommand(this)).fold(
+			e => notifyObservers((false, e.getMessage)),
+			a => notifyObservers((true, ""))
+		)
+
 	def rotate(clockwise: Boolean): Unit = {
 		undoManager.execute(new RotateCommand(this, clockwise))
 		notifyObservers((true, ""))

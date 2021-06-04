@@ -29,6 +29,14 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			controller.placeTile((1, 1))
 			controller.placeTile((1, 1))
 		}
+		"pick tile up" in {
+			val board2 = board.placeCurrentTile(Position(-9, -9)).get
+			val controller = new Controller(board2)
+			controller.pickUpTile()
+			controller.board shouldBe board2.pickupCurrentTile().get
+
+			controller.pickUpTile()
+		}
 		"rotate current tile" in {
 			val controller = new Controller(board)
 			controller.rotate(true)
@@ -106,6 +114,14 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
 			controller.board shouldBe board2
 
+			controller.pickUpTile()
+
+			controller.undo()
+
+			controller.redo()
+
+			controller.undo()
+
 			controller.commit()
 
 			controller.undo()
@@ -129,6 +145,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			controller.undo()
 
 			controller.redo()
+
 		}
 	}
 }
