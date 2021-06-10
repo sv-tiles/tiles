@@ -1,7 +1,8 @@
 package de.htwg.se.tiles.view.gui
 
 import de.htwg.se.tiles.control.Controller
-import de.htwg.se.tiles.model.{Position, Terrain, Tile}
+import de.htwg.se.tiles.model.Position
+import de.htwg.se.tiles.model.boardComponent.{Terrain, TileInterface}
 import de.htwg.se.tiles.util.{Observer, Position2D}
 import scalafx.application.{JFXApp3, Platform}
 import scalafx.scene.control.{Button, Menu, MenuBar, MenuItem}
@@ -80,8 +81,8 @@ class Gui(val controller: Controller) extends JFXApp3 with Observer[(Boolean, St
 	def boardToLocal(pos: Position): Position2D =
 		Position2D(pos.x * size + pane.width.value / 2d - size / 2d, pos.y * size + pane.height.value / 2d - size / 2d) - offset
 
-	def localToBoard(pos: Position2D): Position =
-		Position(((pos.x + offset.x + size / 2d - pane.width.value / 2d) / size).round.intValue, ((pos.y + offset.y + size / 2d - pane.height.value / 2d) / size).round.intValue)
+	def localToBoard(pos: Position2D): (Int, Int) =
+		(((pos.x + offset.x + size / 2d - pane.width.value / 2d) / size).round.intValue, ((pos.y + offset.y + size / 2d - pane.height.value / 2d) / size).round.intValue)
 
 	override def update(value: (Boolean, String) = (true, "")): Unit = {
 		if (value._2.nonEmpty) {
@@ -173,7 +174,7 @@ class Gui(val controller: Controller) extends JFXApp3 with Observer[(Boolean, St
 				onMouseReleased = e => if (!e.isPrimaryButtonDown) {
 					val tmp2 = pane.sceneToLocal(e.getSceneX, e.getSceneY)
 					val tmp = localToBoard(Position2D(tmp2.x - off.x, tmp2.y - off.y))
-					controller.placeTile(tmp.x, tmp.y)
+					controller.placeTile(tmp._1, tmp._2)
 					if (controller.board.currentTile.isDefined) {
 						translateX.value = 0
 						translateY.value = 0
@@ -192,7 +193,7 @@ class Gui(val controller: Controller) extends JFXApp3 with Observer[(Boolean, St
 		case _ => Color.color(0, 0, 1)
 	}
 
-	def generatePolygons(tile: Tile, pos: Position2D, size: Double): List[Shape] = List(
+	def generatePolygons(tile: TileInterface, pos: Position2D, size: Double): List[Shape] = List(
 		new Polygon {
 			points.addAll(
 				pos.x,

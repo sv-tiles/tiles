@@ -1,7 +1,8 @@
 package de.htwg.se.tiles
 
 import de.htwg.se.tiles.control.Controller
-import de.htwg.se.tiles.model.rules.BasicRules
+import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.Board
+import de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl.RulesBase
 import de.htwg.se.tiles.view.gui.Gui
 import de.htwg.se.tiles.view.tui.Tui
 
@@ -11,7 +12,7 @@ object Game {
 	def main(args: Array[String]): Unit = {
 		val test = args.exists(s => s.equals("--test"))
 		var input: String = ""
-		val controller = new Controller(rules = BasicRules())
+		val controller = new Controller(board = Board(), rules = RulesBase())
 		val tui = new Tui(controller, 120, 30, 5, (0, 0))
 		if (!test) {
 			val gui = new Gui(controller)

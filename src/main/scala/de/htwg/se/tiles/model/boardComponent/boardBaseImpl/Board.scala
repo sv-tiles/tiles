@@ -1,21 +1,27 @@
-package de.htwg.se.tiles.model
+package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
-import de.htwg.se.tiles.model.rules.Rules
+import de.htwg.se.tiles.model.Position
+import de.htwg.se.tiles.model.boardComponent.{BoardInterface, TileBuilderInterface, TileInterface}
+import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 
 import scala.collection.immutable.HashMap
 import scala.util.{Failure, Success, Try}
 
 
 // @throws[IllegalArgumentException]
-case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](), currentTile: Option[Tile] = Option(TileBuilder.randomTile()), currentPos: Option[Position] = Option.empty) {
+case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](), currentTile: Option[TileInterface] = Option(TileBuilder.randomTile()), currentPos: Option[Position] = Option.empty) extends BoardInterface {
 	require(currentTile.isEmpty ^ currentPos.isEmpty, "current tile XOR current pos! (" + currentTile.isDefined + ", " + currentPos.isDefined + ")")
 	require(currentPos.isEmpty || tiles.contains(currentPos.get), "At current pos has to be a tile")
 
-	def rotateCurrentTile(clockwise: Boolean = true): Board = if (currentTile.isDefined)
+	override def clear: BoardInterface = Board()
+
+	override def getTileBuilder: TileBuilderInterface = TileBuilder
+
+	override def rotateCurrentTile(clockwise: Boolean = true): Board = if (currentTile.isDefined)
 		copy(currentTile = currentTile.map(t => t.rotate(clockwise))) else
 		copy(tiles = tiles.updated(currentPos.get, tiles(currentPos.get).rotate(clockwise)))
 
-	def placeCurrentTile(pos: Position): Try[Board] = {
+	override def placeCurrentTile(pos: Position): Try[Board] = {
 		if (currentTile.isDefined) {
 			place(pos, currentTile.get).map(b => b.copy(currentTile = Option.empty, currentPos = Option(pos)))
 		} else if (pos == currentPos.get) {
@@ -25,28 +31,28 @@ case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](),
 		}
 	}
 
-	def pickupCurrentTile(): Try[Board] = Try {
+	override def pickupCurrentTile(): Try[Board] = Try {
 		if (currentPos.isEmpty) {
 			return Failure(PlacementException("Current tile not placed"))
 		}
 		copy(tiles = tiles.removed(currentPos.get), currentTile = Option(tiles(currentPos.get)), currentPos = Option.empty)
 	}
 
-	def place(pos: Position, tile: Tile): Try[Board] = Try {
+	override def place(pos: Position, tile: TileInterface): Try[Board] = Try {
 		if (tiles.contains(pos)) {
 			return Failure(PlacementException("Already occupied"))
 		}
-		copy(tiles.updated(pos, tile))
+		copy(tiles = tiles.updated(pos, Tile(tile.north, tile.east, tile.south, tile.west, tile.center)))
 	}
 
-	def commit(rules: Rules): Try[Board] = rules.canPlace(this).flatMap(canPlace => Try {
+	override def commit(rules: RulesInterface): Try[Board] = rules.canPlace(this).flatMap(canPlace => Try {
 		if (!canPlace) {
 			return Failure(PlacementException("Placement not valid"))
 		}
 		copy(currentPos = Option.empty, currentTile = Option(rules.randomPlaceable(this)))
 	})
 
-	def boardToString: String = {
+	override def boardToString: String = {
 		if (tiles.isEmpty) {
 			return "empty"
 		}
@@ -61,7 +67,7 @@ case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](),
 		boardToString(off, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame = false).get
 	}
 
-	def boardToString(offset: Position, mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[Position] = Option.empty): Try[String] = Try {
+	override def boardToString(offset: Position, mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[Position] = Option.empty): Try[String] = Try {
 		require(mapWidth > 0)
 		require(mapHeight > 0)
 		if (highlight.isDefined) {

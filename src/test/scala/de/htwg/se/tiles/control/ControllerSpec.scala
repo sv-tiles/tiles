@@ -1,7 +1,9 @@
 package de.htwg.se.tiles.control
 
-import de.htwg.se.tiles.model.rules.BasicRules
-import de.htwg.se.tiles.model.{Board, Position, TileBuilder}
+import de.htwg.se.tiles.model.Position
+import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.{Board, TileBuilder}
+import de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl.RulesBase
+import de.htwg.se.tiles.model.rulesComponent.rulesFakeImpl.RulesFake
 import de.htwg.se.tiles.util.Command
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -18,12 +20,12 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			.updated(Position(1, 1), TileBuilder.randomTile())
 		)
 		"clear board" in {
-			val controller = new Controller(board)
+			val controller = new Controller(board, RulesFake())
 			controller.clear()
 			controller.board shouldBe Board().copy(currentTile = controller.board.currentTile)
 		}
 		"place tiles" in {
-			val controller = new Controller(board)
+			val controller = new Controller(board, RulesFake())
 			controller.placeTile((10, 10))
 			controller.board shouldBe board.placeCurrentTile(Position(10, 10)).get
 
@@ -32,26 +34,26 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 		}
 		"pick tile up" in {
 			val board2 = board.placeCurrentTile(Position(-9, -9)).get
-			val controller = new Controller(board2)
+			val controller = new Controller(board2, RulesFake())
 			controller.pickUpTile()
 			controller.board shouldBe board2.pickupCurrentTile().get
 
 			controller.pickUpTile()
 		}
 		"rotate current tile" in {
-			val controller = new Controller(board)
+			val controller = new Controller(board, RulesFake())
 			controller.rotate(true)
 			controller.board shouldBe board.rotateCurrentTile(true)
 		}
 		"commit placed tile" in {
-			val controller = new Controller(board)
+			val controller = new Controller(board, RulesFake())
 			val board2 = board.placeCurrentTile(Position(10, 10)).get
 			controller.placeTile((10, 10))
 			controller.commit()
 			controller.board shouldBe board2.commit(controller.rules).get.copy(currentTile = controller.board.currentTile)
 		}
 		"print map as string" in {
-			val controller = new Controller(board)
+			val controller = new Controller(board, RulesFake())
 			val offset = (0, 0)
 			val mapWidth = 120
 			val mapHeight = 60
@@ -64,7 +66,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			controller.mapToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame) shouldBe board.boardToString(Position(offset._1, offset._2), mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame).get
 		}
 		"fail to print map as string if invalid" in {
-			val controller = new Controller(board)
+			val controller = new Controller(board, RulesFake())
 			val offset = (0, 0)
 			val mapWidth = 0
 			val mapHeight = 0
@@ -77,7 +79,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			controller.mapToString(offset, mapWidth, mapHeight, tileWidth, tileHeight, border, margin, frame) shouldBe "requirement failed"
 		}
 		"print current tile as string" in {
-			val controller = new Controller(board)
+			val controller = new Controller(board, RulesFake())
 			val width = 15
 			val height = 5
 			val margin = 2
@@ -85,7 +87,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			controller.currentTileToString(width, height, border, margin) shouldBe board.currentTile.get.tileToString(width, height, border, margin)
 		}
 		"store and restore snapshots" in {
-			val controller = new Controller(board)
+			val controller = new Controller(board, RulesFake())
 			val snapshot = controller.toSnapshot
 
 			controller.board.currentPos.isEmpty shouldBe true
@@ -97,7 +99,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			controller.restoreSnapshot(snapshot).board.currentPos.isEmpty shouldBe true
 		}
 		"correctly undo redo" in {
-			val controller = new Controller()
+			val controller = new Controller(Board(), RulesFake())
 
 			val board = controller.board
 
@@ -149,7 +151,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
 		}
 		"reproduce commit error on undo/redo" in {
-			val controller = new Controller(Board().place(Position(0, 0), TileBuilder.randomTile()).get, BasicRules())
+			val controller = new Controller(Board().place(Position(0, 0), TileBuilder.randomTile()).get, RulesBase())
 
 			controller.placeTile((1, 1))
 

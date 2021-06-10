@@ -1,6 +1,8 @@
-package de.htwg.se.tiles.model.rules
+package de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl
 
-import de.htwg.se.tiles.model.{Board, Position, Terrain, Tile}
+import de.htwg.se.tiles.model.Position
+import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.{Board, Tile}
+import de.htwg.se.tiles.model.boardComponent.{Terrain, boardBaseImpl}
 import org.scalatest.PrivateMethodTester
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -9,7 +11,7 @@ import scala.collection.immutable.HashMap
 
 class BasicRulesSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
 	"BasicRules" should {
-		val rules = BasicRules()
+		val rules = RulesBase()
 		val makeFit = PrivateMethod[Tile](Symbol("makeFit"))
 		val possiblePositions = PrivateMethod[Set[Position]](Symbol("possiblePositions"))
 
@@ -20,14 +22,14 @@ class BasicRulesSpec extends AnyWordSpec with Matchers with PrivateMethodTester 
 			.updated(pos.south(), Tile(Terrain.Forest))
 			.updated(pos.west(), Tile(Terrain.Hills))
 		)
-		val tile = Tile(Terrain.Plains, Terrain.Water, Terrain.Forest, Terrain.Hills, Terrain.Mountains)
+		val tile = boardBaseImpl.Tile(Terrain.Plains, Terrain.Water, Terrain.Forest, Terrain.Hills, Terrain.Mountains)
 
 		"make tiles fit" in {
 			rules invokePrivate makeFit(Tile(Terrain.Mountains), board, pos) shouldBe tile
 			rules invokePrivate makeFit(Tile(Terrain.Mountains), Board(), pos) shouldBe Tile(Terrain.Mountains)
 		}
 		"find possible positions" in {
-			val board = Board(tiles = new HashMap[Position, Tile]()
+			val board = boardBaseImpl.Board(tiles = new HashMap[Position, Tile]()
 				.updated(Position(0, 0), Tile(Terrain.Plains))
 				.updated(Position(1, 0), Tile(Terrain.Plains))
 				.updated(Position(10, 10), Tile(Terrain.Plains))

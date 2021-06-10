@@ -1,13 +1,14 @@
 package de.htwg.se.tiles.control
 
 import de.htwg.se.tiles.model._
-import de.htwg.se.tiles.model.rules.{NoRules, Rules}
+import de.htwg.se.tiles.model.boardComponent.BoardInterface
+import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 import de.htwg.se.tiles.util.{Observable, UndoManager}
 
 import scala.util.{Success, Try}
 
 
-class Controller(var board: Board = Board(), var rules: Rules = NoRules(), var undoManager: UndoManager = new UndoManager()) extends Observable[(Boolean, String)] {
+class Controller(var board: BoardInterface, var rules: RulesInterface, var undoManager: UndoManager = new UndoManager()) extends Observable[(Boolean, String)] {
 
 	def clear(): Unit = {
 		undoManager.execute(new ClearCommand(this))
@@ -15,6 +16,9 @@ class Controller(var board: Board = Board(), var rules: Rules = NoRules(), var u
 	}
 
 	def placeTile(pos: (Int, Int)): Unit =
+		placeTile(Position(pos._1, pos._2))
+
+	def placeTile(pos: Position): Unit =
 		undoManager.execute(new PlaceTileCommand(this, pos)).fold(
 			e => notifyObservers((false, e.getMessage)),
 			a => notifyObservers((true, ""))

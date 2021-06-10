@@ -1,3 +1,5 @@
 package de.htwg.se.tiles.model
 
-case class GameSnapshot private(board: Board)
+import de.htwg.se.tiles.model.boardComponent.BoardInterface
+
+case class GameSnapshot private(board: BoardInterface)

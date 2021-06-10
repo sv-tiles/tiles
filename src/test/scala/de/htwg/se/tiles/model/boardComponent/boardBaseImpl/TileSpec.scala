@@ -1,5 +1,6 @@
-package de.htwg.se.tiles.model
+package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
+import de.htwg.se.tiles.model.boardComponent.{Terrain, boardBaseImpl}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -35,7 +36,7 @@ class TileSpec extends AnyWordSpec with Matchers {
 			}
 		}
 		"printed" should {
-			val tile = Tile(Terrain.Water, Terrain.Mountains, Terrain.Forest, Terrain.Hills, Terrain.Plains)
+			val tile = boardBaseImpl.Tile(Terrain.Water, Terrain.Mountains, Terrain.Forest, Terrain.Hills, Terrain.Plains)
 			val width = 10
 			val height = 5
 			val border = 2

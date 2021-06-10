@@ -1,4 +1,4 @@
-package de.htwg.se.tiles.model
+package de.htwg.se.tiles.model.boardComponent
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

@@ -1,4 +1,4 @@
-package de.htwg.se.tiles.model
+package de.htwg.se.tiles.model.boardComponent
 
 import scala.reflect.runtime.universe.typeOf
 

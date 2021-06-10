@@ -1,6 +1,9 @@
 package de.htwg.se.tiles.util
 
 import de.htwg.se.tiles.control.{Controller, PlaceTileCommand}
+import de.htwg.se.tiles.model.Position
+import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.Board
+import de.htwg.se.tiles.model.rulesComponent.rulesFakeImpl.RulesFake
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -8,11 +11,11 @@ import org.scalatest.wordspec.AnyWordSpec
 class UndoManagerSpec extends AnyWordSpec with Matchers {
 	"A UndoManger" should {
 		val manager: UndoManager = new UndoManager()
-		val controller: Controller = new Controller(undoManager = manager)
+		val controller: Controller = new Controller(Board(), RulesFake(), undoManager = manager)
 
 		"undo redo" in {
 			val board = controller.board
-			manager.execute(new PlaceTileCommand(controller, (0, 0)))
+			manager.execute(new PlaceTileCommand(controller, Position(0, 0)))
 			val board2 = controller.board
 
 			board should not be board2

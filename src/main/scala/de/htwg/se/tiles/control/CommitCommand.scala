@@ -1,14 +1,14 @@
 package de.htwg.se.tiles.control
 
-import de.htwg.se.tiles.model.Board
-import de.htwg.se.tiles.model.rules.Rules
+import de.htwg.se.tiles.model.boardComponent.BoardInterface
+import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 import de.htwg.se.tiles.util.Command
 
 import scala.util.{Failure, Success, Try}
 
-class CommitCommand(controller: Controller, rules: Rules) extends Command {
-	private var board: Board = controller.board;
-	private var newBoard: Board = controller.board
+class CommitCommand(controller: Controller, rules: RulesInterface) extends Command {
+	private var board: BoardInterface = controller.board;
+	private var newBoard: BoardInterface = controller.board
 	private var error = Option.empty[Throwable]
 
 	override def execute(): Try[_] = Try(this.board = controller.board).flatMap(_ => controller.board.commit(rules).map(b => {

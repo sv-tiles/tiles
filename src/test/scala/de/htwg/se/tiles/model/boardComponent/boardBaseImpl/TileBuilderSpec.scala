@@ -1,6 +1,7 @@
-package de.htwg.se.tiles.model
+package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
 import de.htwg.se.tiles.NotSoRandom
+import de.htwg.se.tiles.model.boardComponent.Terrain
 import org.scalatest.PrivateMethodTester
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

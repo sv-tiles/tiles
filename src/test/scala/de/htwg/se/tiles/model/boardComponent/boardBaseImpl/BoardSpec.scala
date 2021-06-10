@@ -1,6 +1,9 @@
-package de.htwg.se.tiles.model
+package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
-import de.htwg.se.tiles.model.rules.{BasicRules, NoRules}
+import de.htwg.se.tiles.model.Position
+import de.htwg.se.tiles.model.boardComponent.{Terrain, boardBaseImpl}
+import de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl.RulesBase
+import de.htwg.se.tiles.model.rulesComponent.rulesFakeImpl.RulesFake
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -9,7 +12,7 @@ import scala.collection.immutable.HashMap
 
 class BoardSpec extends AnyWordSpec with Matchers {
 	"A Board" when {
-		val rules = NoRules()
+		val rules = RulesFake()
 		"initialized without tiles" should {
 			val board = Board()
 			"be empty" in {
@@ -73,7 +76,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			}
 		}
 		"tile added" should {
-			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
+			val tile = boardBaseImpl.Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
 			val board = Board().place(Position(0, 0), tile).get
 			"fail if already occupied" in {
 				board.place(Position(0, 0), tile).isFailure shouldBe true
@@ -84,8 +87,8 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			}
 		}
 		"place current tile" should {
-			val tile1 = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
-			val tile2 = Tile(Terrain.Hills, Terrain.Hills, Terrain.Hills, Terrain.Hills, Terrain.Hills)
+			val tile1 = boardBaseImpl.Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
+			val tile2 = boardBaseImpl.Tile(Terrain.Hills, Terrain.Hills, Terrain.Hills, Terrain.Hills, Terrain.Hills)
 			"do nothing if already in place" in {
 				val board = Board(new HashMap().updated(Position(10, 10), tile1), Option.empty, Option(Position(10, 10)))
 				board.placeCurrentTile(Position(10, 10)).get shouldBe board
@@ -109,7 +112,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			}
 		}
 		"pickup current tile" should {
-			val tile = Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
+			val tile = boardBaseImpl.Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
 			val board1 = Board(new HashMap().updated(Position(0, 0), tile), Option.empty, Option(Position(0, 0)))
 			val board2 = Board(new HashMap(), Option(tile), Option.empty)
 			"throw if current tile not placed" in {
@@ -120,7 +123,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			}
 		}
 		"rotate current tile" should {
-			val tile1 = Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
+			val tile1 = boardBaseImpl.Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
 			"rotate the tile" in {
 				val board1 = Board(new HashMap().updated(Position(0, 0), tile1), Option.empty, Option(Position(0, 0)))
 				board1.rotateCurrentTile(true) shouldBe board1.copy(tiles = new HashMap().updated(Position(0, 0), tile1.rotate(true)))
@@ -132,7 +135,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			}
 		}
 		"commit" should {
-			val tile1 = Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
+			val tile1 = boardBaseImpl.Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
 			"fail if tile not placed" in {
 				val board = Board(new HashMap(), Option(tile1), Option.empty)
 				board.commit(rules).isFailure shouldBe true
@@ -142,7 +145,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 					.updated(Position(0, 0), Tile(Terrain.Plains))
 					.updated(Position(1, 0), Tile(Terrain.Mountains))
 					, Option.empty, Option(Position(1, 0)))
-				board.commit(BasicRules()).isFailure shouldBe true
+				board.commit(RulesBase()).isFailure shouldBe true
 			}
 			"generate a new current tile and discard current pos" in {
 				val board = Board(new HashMap().updated(Position(0, 0), tile1), Option.empty, Option(Position(0, 0)))

@@ -1,6 +1,7 @@
-package de.htwg.se.tiles.model
+package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
-import de.htwg.se.tiles.model.Direction.{East, North, South, West}
+import de.htwg.se.tiles.model.Direction
+import de.htwg.se.tiles.model.boardComponent.{Terrain, TileInterface}
 
 import scala.util.{Success, Try}
 
@@ -10,14 +11,13 @@ object Tile {
 	def apply(center: Terrain, border: Terrain): Tile = Tile(border, border, border, border, center)
 }
 
-case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain) {
+case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain) extends TileInterface {
 
-	def rotate(clockwise: Boolean = true): Tile = if (clockwise)
+	override def rotate(clockwise: Boolean = true): Tile = if (clockwise)
 		copy(north = west, east = north, south = east, west = south) else
 		copy(north = east, east = south, south = west, west = north)
 
-	// @throws[IllegalArgumentException]
-	def printLine(line: Int, width: Int, height: Int, border: Int, margin: Int): Try[String] = Try {
+	override def printLine(line: Int, width: Int, height: Int, border: Int, margin: Int): Try[String] = Try {
 		require(line >= 0 && line < height + margin / 2, "line out of bounds")
 		require(width >= 3, "width too small")
 		require(height >= 3, "height too small")
@@ -36,15 +36,18 @@ case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, ce
 		}
 	}
 
-	def tileToString(width: Int, height: Int, border: Int, margin: Int): Try[String] =
+	override def tileToString(width: Int, height: Int, border: Int, margin: Int): Try[String] =
 		Try((for (i <- 0 until height) yield printLine(i, width, height, border, margin).get).mkString("\n"))
 
 	override def toString: String = center.symbol
 
-	def getTerrainAt(direction: Direction): Try[Terrain] = direction match {
-		case North => Success(north)
-		case East => Success(east)
-		case South => Success(south)
-		case West => Success(west)
+	override def getTerrainAt(direction: Direction): Try[Terrain] = direction match {
+		case Direction.North => Success(north)
+		case Direction.East => Success(east)
+		case Direction.South => Success(south)
+		case Direction.West => Success(west)
 	}
+
+	override def set(north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain): Tile =
+		copy(north, east, south, west, center)
 }
