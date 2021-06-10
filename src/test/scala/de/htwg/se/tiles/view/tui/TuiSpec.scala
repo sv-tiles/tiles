@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.view.tui
 
-import de.htwg.se.tiles.control.Controller
+import de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl.Controller
 import de.htwg.se.tiles.model.Position
 import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.{Board, Tile}
 import de.htwg.se.tiles.model.boardComponent.{Terrain, boardBaseImpl}

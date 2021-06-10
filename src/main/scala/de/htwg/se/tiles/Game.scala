@@ -1,6 +1,6 @@
 package de.htwg.se.tiles
 
-import de.htwg.se.tiles.control.Controller
+import de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl.Controller
 import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.Board
 import de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl.RulesBase
 import de.htwg.se.tiles.view.gui.Gui

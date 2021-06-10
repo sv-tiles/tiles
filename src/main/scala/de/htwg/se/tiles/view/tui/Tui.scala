@@ -1,11 +1,11 @@
 package de.htwg.se.tiles.view.tui
 
-import de.htwg.se.tiles.control.Controller
+import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
 import de.htwg.se.tiles.util.Observer
 
 import scala.util.Try
 
-class Tui(controller: Controller, var width: Int, var height: Int, var scale: Int, var offset: (Int, Int)) extends Observer[(Boolean, String)] {
+class Tui(controller: ControllerInterface, var width: Int, var height: Int, var scale: Int, var offset: (Int, Int)) extends Observer[(Boolean, String)] {
 	require(scale >= 3)
 	require(width >= 1)
 	require(height >= 1)

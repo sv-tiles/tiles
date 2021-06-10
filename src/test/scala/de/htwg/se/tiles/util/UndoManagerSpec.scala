@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.util
 
-import de.htwg.se.tiles.control.{Controller, PlaceTileCommand}
+import de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl.{Controller, PlaceTileCommand}
 import de.htwg.se.tiles.model.Position
 import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.Board
 import de.htwg.se.tiles.model.rulesComponent.rulesFakeImpl.RulesFake

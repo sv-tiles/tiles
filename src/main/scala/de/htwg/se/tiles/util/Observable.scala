@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.util
 
-class Observable[T] {
+trait Observable[T] {
 	private var subscriber: Vector[Observer[T]] = Vector()
 
 	def add(observer: Observer[T]): Unit = subscriber = subscriber :+ observer

@@ -1,6 +1,6 @@
 package de.htwg.se.tiles.view.gui
 
-import de.htwg.se.tiles.control.Controller
+import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
 import de.htwg.se.tiles.model.Position
 import de.htwg.se.tiles.model.boardComponent.{Terrain, TileInterface}
 import de.htwg.se.tiles.util.{Observer, Position2D}
@@ -14,7 +14,7 @@ import scalafx.scene.text.Text
 import scalafx.scene.{Group, Scene}
 
 
-class Gui(val controller: Controller) extends JFXApp3 with Observer[(Boolean, String)] {
+class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Boolean, String)] {
 	private var size = 50d
 	private var offset = Position2D(0d, 0d)
 

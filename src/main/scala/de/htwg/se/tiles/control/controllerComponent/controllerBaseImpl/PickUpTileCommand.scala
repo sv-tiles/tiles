@@ -1,4 +1,4 @@
-package de.htwg.se.tiles.control
+package de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl
 
 import de.htwg.se.tiles.model.boardComponent.BoardInterface
 import de.htwg.se.tiles.util.Command
