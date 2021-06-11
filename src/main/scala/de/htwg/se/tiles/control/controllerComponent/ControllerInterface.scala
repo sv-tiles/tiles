@@ -1,13 +1,16 @@
 package de.htwg.se.tiles.control.controllerComponent
 
 import de.htwg.se.tiles.model.boardComponent.BoardInterface
-import de.htwg.se.tiles.model.{GameSnapshot, Position}
+import de.htwg.se.tiles.model.{Direction, GameSnapshot, Position}
 import de.htwg.se.tiles.util.Observable
+import scalafx.scene.paint.Color
 
 import scala.util.Try
 
 trait ControllerInterface extends Observable[(Boolean, String)] {
 	def board: BoardInterface
+
+	def addPlayer(name: String, color: Color = Color.Black): Unit
 
 	def clear(): Unit
 
@@ -19,7 +22,7 @@ trait ControllerInterface extends Observable[(Boolean, String)] {
 
 	def rotate(clockwise: Boolean): Unit
 
-	def commit(): Unit
+	def commit(placePeople: Option[Direction]): Unit
 
 	def mapToString(offset: (Int, Int), mapWidth: Int, mapHeight: Int, tileWidth: Int, tileHeight: Int, border: Int, margin: Int, frame: Boolean = true, highlight: Option[(Int, Int)] = Option.empty): String
 

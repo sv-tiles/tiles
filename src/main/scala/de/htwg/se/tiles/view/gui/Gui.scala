@@ -5,9 +5,9 @@ import de.htwg.se.tiles.model.Position
 import de.htwg.se.tiles.model.boardComponent.{Terrain, TileInterface}
 import de.htwg.se.tiles.util.{Observer, Position2D}
 import scalafx.application.{JFXApp3, Platform}
-import scalafx.scene.control.{Button, Menu, MenuBar, MenuItem}
+import scalafx.scene.control._
 import scalafx.scene.input.MouseButton
-import scalafx.scene.layout.{BorderPane, Pane, VBox}
+import scalafx.scene.layout._
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Polygon, Polyline, Rectangle, Shape}
 import scalafx.scene.text.Text
@@ -23,8 +23,14 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 		style = "-fx-background-color: rgb(50,50,50)"
 	}
 
-	private val info = new Text("-")
+	private val info = new Text("") {
+		style = "-fx-fill: white; -fx-font-size: 20px"
+	}
 	private var infoTime = 0L
+
+	private val player = new Text("no players") {
+		style = "-fx-fill: white; -fx-font-size: 20px"
+	}
 
 	override def start(): Unit = {
 		stage = new JFXApp3.PrimaryStage {
@@ -37,13 +43,29 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 					style = "-fx-background-color: rgb(100,100,100)"
 					center = pane
 					top = new MenuBar {
-						menus = List(new Menu("Game") {
-							items = List(new MenuItem("Clear") {
-								onAction = e => controller.clear()
-							})
-						})
+						menus = List(
+							new Menu("Game") {
+								items = List(
+									new MenuItem("Clear") {
+										onAction = e => controller.clear()
+									},
+									new MenuItem("Add player") {
+										onAction = _ => new TextInputDialog() {
+											initOwner(stage)
+											title = "Add player"
+											contentText = "name:"
+										}.showAndWait().foreach(name => {
+											controller.addPlayer(name)
+											update()
+										})
+									}
+								)
+							}
+						)
 					}
-					bottom = info
+					bottom = new HBox(10) {
+						children = List(player, info)
+					}
 					left = new VBox {
 						children = List(
 							new Button("undo") {
@@ -85,6 +107,13 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 		(((pos.x + offset.x + size / 2d - pane.width.value / 2d) / size).round.intValue, ((pos.y + offset.y + size / 2d - pane.height.value / 2d) / size).round.intValue)
 
 	override def update(value: (Boolean, String) = (true, "")): Unit = {
+		if (controller.board.players.isEmpty) {
+			info.text = "No players!"
+			return
+		}
+
+		player.text = "Player: " + controller.board.getCurrentPlayer.name
+
 		if (value._2.nonEmpty) {
 			info.text = value._2
 			infoTime = System.currentTimeMillis()
@@ -122,7 +151,8 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 					} else if (e.isBackButtonDown) {
 						controller.rotate(true)
 					} else if (e.isMiddleButtonDown) {
-						controller.commit()
+						// TODO place people
+						controller.commit(Option.empty)
 					}
 					onMouseDragged = e => if (e.isPrimaryButtonDown) {
 						translateX.value = e.getSceneX - anchor.x

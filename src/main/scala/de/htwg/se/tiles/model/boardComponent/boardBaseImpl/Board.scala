@@ -1,21 +1,25 @@
 package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
-import de.htwg.se.tiles.model.Position
 import de.htwg.se.tiles.model.boardComponent.{BoardInterface, TileBuilderInterface, TileInterface}
+import de.htwg.se.tiles.model.playerComponent.PlayerInterface
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
+import de.htwg.se.tiles.model.{Direction, Position}
 
 import scala.collection.immutable.HashMap
 import scala.util.{Failure, Success, Try}
 
 
 // @throws[IllegalArgumentException]
-case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](), currentTile: Option[TileInterface] = Option(TileBuilder.randomTile()), currentPos: Option[Position] = Option.empty) extends BoardInterface {
+case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer: Int = 0, tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](), currentTile: Option[TileInterface] = Option(TileBuilder.randomTile()), currentPos: Option[Position] = Option.empty) extends BoardInterface {
 	require(currentTile.isEmpty ^ currentPos.isEmpty, "current tile XOR current pos! (" + currentTile.isDefined + ", " + currentPos.isDefined + ")")
 	require(currentPos.isEmpty || tiles.contains(currentPos.get), "At current pos has to be a tile")
+	require(currentPlayer == 0 || (currentPlayer >= 0 && currentPlayer < players.length))
 
-	override def clear: BoardInterface = Board()
+	override def clear: BoardInterface = Board(players = players)
 
 	override def getTileBuilder: TileBuilderInterface = TileBuilder
+
+	override def getCurrentPlayer: PlayerInterface = players(currentPlayer)
 
 	override def rotateCurrentTile(clockwise: Boolean = true): Board = if (currentTile.isDefined)
 		copy(currentTile = currentTile.map(t => t.rotate(clockwise))) else
@@ -45,12 +49,25 @@ case class Board(tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](),
 		copy(tiles = tiles.updated(pos, Tile(tile.north, tile.east, tile.south, tile.west, tile.center)))
 	}
 
-	override def commit(rules: RulesInterface): Try[Board] = rules.canPlace(this).flatMap(canPlace => Try {
+	override def commit(rules: RulesInterface, people: Option[Direction] = Option.empty): Try[BoardInterface] = rules.canPlace(this).flatMap(canPlace => Try {
 		if (!canPlace) {
 			return Failure(PlacementException("Placement not valid"))
 		}
-		copy(currentPos = Option.empty, currentTile = Option(rules.randomPlaceable(this)))
+		if (people.isDefined && players(currentPlayer).people.length >= rules.maxPeople) {
+			return Failure(PlacementException("No people available"))
+		}
+		if (players.isEmpty) {
+			return Failure(PlacementException("No players"))
+		}
+		rules.evaluatePoints(copy(
+			currentPos = Option.empty,
+			currentTile = Option(rules.randomPlaceable(this)),
+			players = people.fold(players)(d => players.updated(currentPlayer, getCurrentPlayer.setPeople(getCurrentPlayer.people.appended((currentPos.get, d))))),
+			currentPlayer = (currentPlayer + 1) % players.length
+		))
 	})
+
+	override def updatePlayers(players: Vector[PlayerInterface]): BoardInterface = copy(players = players)
 
 	override def boardToString: String = {
 		if (tiles.isEmpty) {

@@ -2,9 +2,11 @@ package de.htwg.se.tiles
 
 import de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl.Controller
 import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.Board
+import de.htwg.se.tiles.model.playerComponent.playerBaseImpl.PlayerBase
 import de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl.RulesBase
 import de.htwg.se.tiles.view.gui.Gui
 import de.htwg.se.tiles.view.tui.Tui
+import scalafx.scene.paint.Color
 
 import scala.io.StdIn.readLine
 
@@ -12,7 +14,7 @@ object Game {
 	def main(args: Array[String]): Unit = {
 		val test = args.exists(s => s.equals("--test"))
 		var input: String = ""
-		val controller = new Controller(board = Board(), rules = RulesBase())
+		val controller = new Controller(board = Board(), rules = RulesBase(), playerGenerator = (name: String, color: Color) => PlayerBase(name, color))
 		val tui = new Tui(controller, 120, 30, 5, (0, 0))
 		if (!test) {
 			val gui = new Gui(controller)

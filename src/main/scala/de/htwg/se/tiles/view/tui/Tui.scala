@@ -21,7 +21,8 @@ class Tui(controller: ControllerInterface, var width: Int, var height: Int, var 
 	}
 
 	commandHandlers.appendHandler(new CommandHandler("place", "u") {
-		override def handleSelf(command: String): Unit = controller.commit()
+		// TODO place people
+		override def handleSelf(command: String): Unit = controller.commit(Option.empty)
 	}).appendHandler(new CommandHandler("t") {
 		override def handleSelf(command: String): Unit = {
 			cursor = (cursor._1, cursor._2 - 1)
@@ -69,6 +70,11 @@ class Tui(controller: ControllerInterface, var width: Int, var height: Int, var 
 
 	def command(command: String): Option[String] = {
 		result = Option.empty[String]
+		if (command.matches("addPlayer .+")) {
+			controller.addPlayer(command.split(" +", 2)(1))
+			update((true, ""))
+			return result
+		}
 
 		val cmd = command.replaceAll("\\W+", " ").trim()
 		if (!commandHandlers.handleCommand(cmd)) {
@@ -120,6 +126,12 @@ class Tui(controller: ControllerInterface, var width: Int, var height: Int, var 
 			println(value._2)
 		}
 		print(Console.RESET)
+
+		if (controller.board.players.isEmpty) {
+			println(Console.RED + "No players!\n" + Console.RESET + "addPlayer <name>")
+		} else {
+			println("Player: " + Console.BOLD + controller.board.getCurrentPlayer.name + Console.RESET)
+		}
 	}
 
 

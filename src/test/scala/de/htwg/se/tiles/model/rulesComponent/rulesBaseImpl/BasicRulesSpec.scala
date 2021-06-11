@@ -3,9 +3,11 @@ package de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl
 import de.htwg.se.tiles.model.Position
 import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.{Board, Tile}
 import de.htwg.se.tiles.model.boardComponent.{Terrain, boardBaseImpl}
+import de.htwg.se.tiles.model.playerComponent.playerBaseImpl.PlayerBase
 import org.scalatest.PrivateMethodTester
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import scalafx.scene.paint.Color
 
 import scala.collection.immutable.HashMap
 
@@ -20,7 +22,8 @@ class BasicRulesSpec extends AnyWordSpec with Matchers with PrivateMethodTester 
 			.updated(pos.north(), Tile(Terrain.Plains))
 			.updated(pos.east(), Tile(Terrain.Water))
 			.updated(pos.south(), Tile(Terrain.Forest))
-			.updated(pos.west(), Tile(Terrain.Hills))
+			.updated(pos.west(), Tile(Terrain.Hills)),
+			players = Vector().appended(PlayerBase("test", Color.Black))
 		)
 		val tile = boardBaseImpl.Tile(Terrain.Plains, Terrain.Water, Terrain.Forest, Terrain.Hills, Terrain.Mountains)
 

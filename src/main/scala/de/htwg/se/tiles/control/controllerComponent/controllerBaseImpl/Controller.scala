@@ -3,13 +3,19 @@ package de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl
 import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
 import de.htwg.se.tiles.model._
 import de.htwg.se.tiles.model.boardComponent.BoardInterface
+import de.htwg.se.tiles.model.playerComponent.PlayerInterface
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 import de.htwg.se.tiles.util.UndoManager
+import scalafx.scene.paint.Color
 
 import scala.util.{Success, Try}
 
 
-class Controller(var board: BoardInterface, var rules: RulesInterface, var undoManager: UndoManager = new UndoManager()) extends ControllerInterface {
+class Controller(var board: BoardInterface, var rules: RulesInterface, playerGenerator: (String, Color) => PlayerInterface, var undoManager: UndoManager = new UndoManager()) extends ControllerInterface {
+	override def addPlayer(name: String, color: Color = Color.Black): Unit = {
+		board = board.updatePlayers(board.players.appended(playerGenerator.apply(name, color)))
+		notifyObservers((true, ""))
+	}
 
 	override def clear(): Unit = {
 		undoManager.execute(new ClearCommand(this))
@@ -36,8 +42,8 @@ class Controller(var board: BoardInterface, var rules: RulesInterface, var undoM
 		notifyObservers((true, ""))
 	}
 
-	override def commit(): Unit =
-		undoManager.execute(new CommitCommand(this, rules)).fold(
+	override def commit(placePeople: Option[Direction]): Unit =
+		undoManager.execute(new CommitCommand(this, rules, placePeople)).fold(
 			e => notifyObservers((false, e.getMessage)),
 			_ => notifyObservers((true, ""))
 		)

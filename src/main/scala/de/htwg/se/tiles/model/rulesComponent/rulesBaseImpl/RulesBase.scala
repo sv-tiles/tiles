@@ -6,7 +6,7 @@ import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 
 import scala.collection.immutable.HashMap
 
-case class RulesBase() extends RulesInterface {
+case class RulesBase(maxPeople: Int = 5) extends RulesInterface {
 	override def canPlace(tile: TileInterface, tiles: HashMap[Position, TileInterface], at: Position): Boolean = {
 		if (tiles.isEmpty) {
 			return true
@@ -34,4 +34,9 @@ case class RulesBase() extends RulesInterface {
 	)
 
 	override def randomPlaceable(b: BoardInterface): TileInterface = if (b.tiles.isEmpty) b.getTileBuilder.randomTile() else b.getTileBuilder.rotateRandom(makeFit(b.getTileBuilder.randomTile(), b, possiblePositions(b).toVector(0))).get
+
+	override def evaluatePoints(b: BoardInterface): BoardInterface = {
+		// TODO people -> points, findIslands
+		b
+	}
 }

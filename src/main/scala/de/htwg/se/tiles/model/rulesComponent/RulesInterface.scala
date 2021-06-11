@@ -7,6 +7,8 @@ import scala.collection.immutable.HashMap
 import scala.util.{Failure, Try}
 
 trait RulesInterface {
+	def maxPeople: Int
+
 	def canPlace(tile: TileInterface, tiles: HashMap[Position, TileInterface], at: Position): Boolean
 
 	def canPlace(b: BoardInterface): Try[Boolean] =
@@ -15,4 +17,6 @@ trait RulesInterface {
 		)
 
 	def randomPlaceable(b: BoardInterface): TileInterface
+
+	def evaluatePoints(b: BoardInterface): BoardInterface
 }
