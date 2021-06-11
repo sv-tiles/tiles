@@ -46,6 +46,7 @@ case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, ce
 		case Direction.East => Success(east)
 		case Direction.South => Success(south)
 		case Direction.West => Success(west)
+		case Direction.Center => Success(center)
 	}
 
 	override def set(north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain): Tile =

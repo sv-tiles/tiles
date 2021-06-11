@@ -106,6 +106,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 		"correctly undo redo" in {
 			val controller = new Controller(Board(), RulesFake(), playerGenerator = playerGenerator)
 
+			controller.addPlayer("p1")
+
 			val board = controller.board
 
 			controller.placeTile((0, 0))

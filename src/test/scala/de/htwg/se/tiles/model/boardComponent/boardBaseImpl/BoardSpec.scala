@@ -1,10 +1,10 @@
 package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
-import de.htwg.se.tiles.model.Position
 import de.htwg.se.tiles.model.boardComponent.{Terrain, boardBaseImpl}
 import de.htwg.se.tiles.model.playerComponent.playerBaseImpl.PlayerBase
 import de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl.RulesBase
 import de.htwg.se.tiles.model.rulesComponent.rulesFakeImpl.RulesFake
+import de.htwg.se.tiles.model.{Direction, Position}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import scalafx.scene.paint.Color
@@ -30,6 +30,10 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			}
 			"throw if current pos is not occupied" in {
 				an[IllegalArgumentException] should be thrownBy Board(tiles = new HashMap(), currentTile = Option.empty, currentPos = Option(Position(0, 0)))
+			}
+			"throw if currentPlayer out of bounds" in {
+				an[IllegalArgumentException] should be thrownBy Board(tiles = new HashMap(), players = Vector().appended(PlayerBase("p1", Color.Black)), currentPlayer = -1)
+				an[IllegalArgumentException] should be thrownBy Board(tiles = new HashMap(), players = Vector().appended(PlayerBase("p1", Color.Black)), currentPlayer = 1)
 			}
 		}
 		"printed" should {
@@ -139,21 +143,44 @@ class BoardSpec extends AnyWordSpec with Matchers {
 		"commit" should {
 			val tile1 = boardBaseImpl.Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
 			"fail if tile not placed" in {
-				val board = Board(tiles = new HashMap(), currentTile = Option(tile1), currentPos = Option.empty)
+				val board = Board(tiles = new HashMap(), currentTile = Option(tile1), currentPos = Option.empty, players = Vector().appended(PlayerBase("test", Color.Black)))
 				board.commit(rules).isFailure shouldBe true
 			}
 			"fail if not valid" in {
 				val board = Board(tiles = new HashMap()
 					.updated(Position(0, 0), Tile(Terrain.Plains))
-					.updated(Position(1, 0), Tile(Terrain.Mountains))
-					, currentTile = Option.empty, currentPos = Option(Position(1, 0)))
+					.updated(Position(1, 0), Tile(Terrain.Mountains)),
+					currentTile = Option.empty, currentPos = Option(Position(1, 0)),
+					players = Vector().appended(PlayerBase("test", Color.Black)))
 				board.commit(RulesBase()).isFailure shouldBe true
+			}
+			"fail if players is empty" in {
+				val board = Board(
+					tiles = new HashMap().updated(Position(0, 0), tile1),
+					currentTile = Option.empty,
+					currentPos = Option(Position(0, 0))
+				)
+				board.commit(RulesBase()).failed.get.getMessage shouldBe "No players"
 			}
 			"generate a new current tile and discard current pos" in {
 				val board = Board(tiles = new HashMap().updated(Position(0, 0), tile1), currentTile = Option.empty, currentPos = Option(Position(0, 0)), players = Vector().appended(PlayerBase("test", Color.Black)))
 				val committed = board.commit(rules).get
 				committed shouldBe board.copy(currentPos = Option.empty, currentTile = committed.currentTile)
 				committed.currentTile should not be Option.empty
+			}
+			"place people" in {
+				val board = Board(tiles = new HashMap().updated(Position(0, 0), tile1), currentTile = Option.empty, currentPos = Option(Position(0, 0)), players = Vector().appended(PlayerBase("test", Color.Black)))
+				val newBoard = board.commit(rules, Option(Direction.Center))
+
+				newBoard.get.players(0).people.length shouldBe 1
+				newBoard.get.players(0).people(0)._1 shouldBe Position(0, 0)
+				newBoard.get.players(0).people(0)._2 shouldBe Direction.Center
+			}
+			"fail if no more people available" in {
+				val board = Board(tiles = new HashMap().updated(Position(0, 0), tile1), currentTile = Option.empty, currentPos = Option(Position(0, 0)), players = Vector().appended(PlayerBase("test", Color.Black,
+					people = Range(0, rules.maxPeople).map(v => (Position(1, v), Direction.Center)).toVector
+				)))
+				board.commit(rules, Option(Direction.Center)).failed.get.getMessage shouldBe "No people available"
 			}
 		}
 	}

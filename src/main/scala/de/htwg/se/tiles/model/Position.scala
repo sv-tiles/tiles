@@ -17,10 +17,11 @@ case class Position(x: Int, y: Int) {
 		case Direction.East => east()
 		case Direction.South => south()
 		case Direction.West => west()
+		case Direction.Center => this
 	}
 
 	def neighbours(): Set[Position] = Set(north(), east(), south(), west())
 
 	def directionOfNeighbour(position: Position): Try[Direction] =
-		Direction.all.find(d => neighbour(d) == position).fold[Try[Direction]](Failure(new IllegalArgumentException()))(d => Success(d))
+		Direction.allDirections.find(d => neighbour(d) == position).fold[Try[Direction]](Failure(new IllegalArgumentException()))(d => Success(d))
 }

@@ -1,5 +1,6 @@
 package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
+import de.htwg.se.tiles.model.Direction
 import de.htwg.se.tiles.model.boardComponent.{Terrain, boardBaseImpl}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -33,6 +34,13 @@ class TileSpec extends AnyWordSpec with Matchers {
 				tile.rotate(false).rotate(false) shouldBe rotatedCounterclockwise.rotate(false)
 				tile.rotate(false).rotate(false).rotate(false) shouldBe rotatedCounterclockwise.rotate(false).rotate(false)
 				tile.rotate(false).rotate(false).rotate(false).rotate(false) shouldBe tile
+			}
+			"return terrain by direction" in {
+				tile.getTerrainAt(Direction.Center).get shouldBe Terrain.Plains
+				tile.getTerrainAt(Direction.North).get shouldBe Terrain.Water
+				tile.getTerrainAt(Direction.East).get shouldBe Terrain.Mountains
+				tile.getTerrainAt(Direction.South).get shouldBe Terrain.Forest
+				tile.getTerrainAt(Direction.West).get shouldBe Terrain.Hills
 			}
 		}
 		"printed" should {

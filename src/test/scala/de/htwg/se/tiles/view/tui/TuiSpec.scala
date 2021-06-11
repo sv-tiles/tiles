@@ -35,7 +35,13 @@ class TuiSpec extends AnyWordSpec with Matchers {
 			val height = 30
 			val scale = 3
 
-
+			"add player" in {
+				val controller = new Controller(Board(), RulesFake(), playerGenerator)
+				val tui = new Tui(controller, width, height, scale, (0, 0))
+				tui.command("addPlayer p1")
+				controller.board.players.length shouldBe 1
+				controller.board.players(0).name shouldBe "p1"
+			}
 			"move offset (x/y) by 1 on 'w', 'a', 's', 'd'" in {
 				val tui = new Tui(new Controller(Board(), RulesFake(), playerGenerator = playerGenerator), width, height, scale, (0, 0))
 				val original = new Tui(new Controller(Board(), RulesFake(), playerGenerator = playerGenerator), width, height, scale, (0, 0))

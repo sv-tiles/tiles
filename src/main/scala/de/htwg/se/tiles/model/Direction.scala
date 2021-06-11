@@ -11,5 +11,8 @@ object Direction {
 
 	case object West extends Direction
 
-	val all: Iterable[Direction] = List(North, East, South, West)
+	case object Center extends Direction
+
+	/** Without Center */
+	val allDirections: Iterable[Direction] = List(North, East, South, West)
 }
