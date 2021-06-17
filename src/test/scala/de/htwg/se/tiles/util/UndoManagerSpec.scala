@@ -13,7 +13,7 @@ import scalafx.scene.paint.Color
 class UndoManagerSpec extends AnyWordSpec with Matchers {
 	"A UndoManger" should {
 		val manager: UndoManager = new UndoManager()
-		val controller: Controller = new Controller(Board(), RulesFake(), undoManager = manager, playerGenerator = (name: String, color: Color) => PlayerBase(name, color))
+		val controller: Controller = new Controller(Board(), RulesFake(), undoManager = manager, playerFactory = (name: String, color: Color) => PlayerBase(name, color))
 
 		"undo redo" in {
 			val board = controller.board

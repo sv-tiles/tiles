@@ -11,8 +11,8 @@ import scalafx.scene.paint.Color
 
 import scala.collection.immutable.HashMap
 
-class BasicRulesSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
-	"BasicRules" should {
+class RulesBaseSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
+	"RulesBase" should {
 		val rules = RulesBase()
 		val makeFit = PrivateMethod[Tile](Symbol("makeFit"))
 		val possiblePositions = PrivateMethod[Set[Position]](Symbol("possiblePositions"))

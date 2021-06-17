@@ -7,6 +7,10 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test"
 libraryDependencies += "org.scalafx" %% "scalafx" % "16.0.0-R24"
 
+libraryDependencies += "com.google.inject" % "guice" % "5.0.1"
+libraryDependencies += "com.google.inject.extensions" % "guice-assistedinject" % "5.0.1"
+libraryDependencies += "net.codingwell" %% "scala-guice" % "5.0.1"
+
 lazy val javaFXModules = {
 	// Determine OS version of JavaFX binaries
 	lazy val osName = System.getProperty("os.name") match {

@@ -1,5 +1,6 @@
 package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
+import com.google.inject.Inject
 import de.htwg.se.tiles.model.boardComponent.{BoardInterface, TileBuilderInterface, TileInterface}
 import de.htwg.se.tiles.model.playerComponent.PlayerInterface
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
@@ -14,6 +15,9 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 	require(currentTile.isEmpty ^ currentPos.isEmpty, "current tile XOR current pos! (" + currentTile.isDefined + ", " + currentPos.isDefined + ")")
 	require(currentPos.isEmpty || tiles.contains(currentPos.get), "At current pos has to be a tile")
 	require(currentPlayer == 0 || (currentPlayer >= 0 && currentPlayer < players.length))
+
+	@Inject
+	def this() = this(currentPlayer = 0)
 
 	override def clear: BoardInterface = Board(players = players)
 

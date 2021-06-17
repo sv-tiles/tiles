@@ -1,9 +1,10 @@
 package de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl
 
+import com.google.inject.Inject
 import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
 import de.htwg.se.tiles.model._
 import de.htwg.se.tiles.model.boardComponent.BoardInterface
-import de.htwg.se.tiles.model.playerComponent.PlayerInterface
+import de.htwg.se.tiles.model.playerComponent.PlayerFactory
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 import de.htwg.se.tiles.util.UndoManager
 import scalafx.scene.paint.Color
@@ -11,9 +12,9 @@ import scalafx.scene.paint.Color
 import scala.util.{Success, Try}
 
 
-class Controller(var board: BoardInterface, var rules: RulesInterface, playerGenerator: (String, Color) => PlayerInterface, var undoManager: UndoManager = new UndoManager()) extends ControllerInterface {
+class Controller @Inject()(var board: BoardInterface, var rules: RulesInterface, playerFactory: PlayerFactory, var undoManager: UndoManager = new UndoManager()) extends ControllerInterface {
 	override def addPlayer(name: String, color: Color = Color.Black): Unit = {
-		board = board.updatePlayers(board.players.appended(playerGenerator.apply(name, color)))
+		board = board.updatePlayers(board.players.appended(playerFactory.create(name, color)))
 		notifyObservers((true, ""))
 	}
 

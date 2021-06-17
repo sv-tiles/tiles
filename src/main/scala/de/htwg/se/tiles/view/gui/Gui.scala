@@ -18,6 +18,17 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 	private var size = 50d
 	private var offset = Position2D(0d, 0d)
 
+	def jumpstart(test: Boolean): Unit = {
+		if (test) {
+			return
+		}
+		val guiThread = new Thread(() => {
+			main(Array.empty)
+			System.exit(0)
+		})
+		guiThread.setDaemon(true)
+		guiThread.start()
+	}
 
 	private val pane: Pane = new Pane {
 		style = "-fx-background-color: rgb(50,50,50)"

@@ -1,30 +1,24 @@
 package de.htwg.se.tiles
 
+import com.google.inject.Guice
 import de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl.Controller
-import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.Board
-import de.htwg.se.tiles.model.playerComponent.playerBaseImpl.PlayerBase
-import de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl.RulesBase
 import de.htwg.se.tiles.view.gui.Gui
 import de.htwg.se.tiles.view.tui.Tui
-import scalafx.scene.paint.Color
 
 import scala.io.StdIn.readLine
 
 object Game {
 	def main(args: Array[String]): Unit = {
 		val test = args.exists(s => s.equals("--test"))
+		val testModule = args.exists(s => s.equals("--test-module"))
+
+		val injector = Guice.createInjector(if (testModule) TestModule() else GameModule())
+
 		var input: String = ""
-		val controller = new Controller(board = Board(), rules = RulesBase(), playerGenerator = (name: String, color: Color) => PlayerBase(name, color))
+		val controller = injector.getInstance(classOf[Controller])
 		val tui = new Tui(controller, 120, 30, 5, (0, 0))
-		if (!test) {
-			val gui = new Gui(controller)
-			val guiThread = new Thread(() => {
-				gui.main(Array.empty);
-				System.exit(0)
-			})
-			guiThread.setDaemon(true)
-			guiThread.start()
-		}
+		val gui = new Gui(controller)
+		gui.jumpstart(test)
 		do {
 			input = readLine()
 			tui.command(input)
