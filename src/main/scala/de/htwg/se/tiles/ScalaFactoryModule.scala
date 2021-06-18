@@ -7,5 +7,5 @@ import net.codingwell.scalaguice.{ScalaModule, typeLiteral}
 import scala.reflect.runtime.universe.TypeTag
 
 abstract class ScalaFactoryModule extends AbstractModule with ScalaModule {
-	def bindModule[T: TypeTag, Timpl <: T : TypeTag, F: TypeTag] = install(new FactoryModuleBuilder().implement(typeLiteral[T], typeLiteral[Timpl]).build(typeLiteral[F]))
+	def bindModule[T: TypeTag, Timpl <: T : TypeTag, F: TypeTag](): Unit = install(new FactoryModuleBuilder().implement(typeLiteral[T], typeLiteral[Timpl]).build(typeLiteral[F]))
 }

@@ -186,7 +186,9 @@ class BoardSpec extends AnyWordSpec with Matchers {
 	}
 	"A board" should {
 		"have equivalent no-args apply and constructor methods" in {
-			Board.apply() shouldBe new Board()
+			val b1 = Board.apply()
+			val b2 = new Board()
+			b1.copy(currentTile = b2.currentTile) shouldBe b2
 		}
 	}
 }
