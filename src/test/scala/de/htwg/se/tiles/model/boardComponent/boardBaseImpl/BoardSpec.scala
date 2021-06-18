@@ -184,4 +184,9 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			}
 		}
 	}
+	"A board" should {
+		"have equivalent no-args apply and constructor methods" in {
+			Board.apply() shouldBe new Board()
+		}
+	}
 }

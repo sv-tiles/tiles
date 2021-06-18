@@ -78,7 +78,6 @@ class TuiSpec extends AnyWordSpec with Matchers {
 			"set cursor to offset on 'cursor reset'" in {
 				val tui = new Tui(new Controller(Board(), RulesFake(), playerFactory = playerGenerator), width, height, scale, (1, 10))
 
-
 				tui.command("cursor reset").isEmpty shouldBe true
 				tui.cursor shouldBe tui.offset
 			}
@@ -189,6 +188,36 @@ class TuiSpec extends AnyWordSpec with Matchers {
 
 				tui.command("clear")
 				controller.board shouldBe Board().copy(currentTile = controller.board.currentTile)
+			}
+			"undo redo" in {
+				val controller = new Controller(Board(), RulesFake(), playerGenerator)
+				val tui = new Tui(controller, width, height, scale, (0, 0))
+				tui.command("addPlayer test")
+				tui.command("h")
+
+				val boardBeforePlace = controller.board
+				tui.command("place")
+				controller.board should not be boardBeforePlace
+				val boardAfterPlace = controller.board
+				tui.command("undo")
+				controller.board shouldBe boardBeforePlace
+				tui.command("redo")
+				controller.board shouldBe boardAfterPlace
+
+				tui.command("h")
+				tui.command("place")
+
+				val board2 = controller.board
+
+				tui.command("undo")
+				tui.command("undo")
+
+				controller.board shouldBe boardAfterPlace
+
+				tui.command("redo")
+				tui.command("redo")
+
+				controller.board shouldBe board2
 			}
 		}
 	}

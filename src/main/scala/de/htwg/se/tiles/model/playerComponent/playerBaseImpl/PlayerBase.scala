@@ -8,7 +8,7 @@ import scalafx.scene.paint.Color
 
 case class PlayerBase(name: String, color: Color, people: Vector[(Position, Direction)] = Vector.empty, points: Int = 0) extends PlayerInterface {
 	@Inject
-	def this(@Assisted("name") name: String, @Assisted("color") color: Color) = this(name, color, people = Vector.empty, points = 0)
+	def this(@Assisted name: String, @Assisted color: Color) = this(name, color, people = Vector.empty, points = 0)
 
 	override def setPeople(people: Vector[(Position, Direction)]): PlayerInterface = copy(people = people)
 

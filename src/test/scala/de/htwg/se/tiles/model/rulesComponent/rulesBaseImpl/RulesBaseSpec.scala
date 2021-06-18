@@ -59,5 +59,8 @@ class RulesBaseSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
 			noException should be thrownBy rules.randomPlaceable(Board())
 			noException should be thrownBy rules.randomPlaceable(board)
 		}
+		"have equivalent no-prams constructors" in {
+			RulesBase.apply().maxPeople shouldBe new RulesBase().maxPeople
+		}
 	}
 }

@@ -29,4 +29,4 @@ libraryDependencies ++= javaFXModules
 
 Compile / resourceDirectory := baseDirectory.value / "src/main/resources"
 
-coverageExcludedPackages := "de.htwg.se.tiles.view.gui"
+coverageExcludedPackages := "de\\.htwg\\.se\\.tiles\\.view\\.gui;.*Game"
