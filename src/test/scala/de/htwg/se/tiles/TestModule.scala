@@ -12,7 +12,7 @@ import de.htwg.se.tiles.model.rulesComponent.rulesFakeImpl.RulesFake
 case class TestModule() extends ScalaFactoryModule {
 	override def configure(): Unit = {
 		bind[RulesInterface].to[RulesFake]
-		bindModule[PlayerInterface, PlayerBase, PlayerFactory]
+		bindFactory[PlayerInterface, PlayerBase, PlayerFactory]
 		bind[BoardInterface].to[Board]
 		bind[ControllerInterface].to[Controller]
 	}

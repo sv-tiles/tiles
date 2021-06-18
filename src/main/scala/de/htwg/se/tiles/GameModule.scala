@@ -12,7 +12,7 @@ import de.htwg.se.tiles.model.rulesComponent.rulesBaseImpl.RulesBase
 case class GameModule() extends ScalaFactoryModule {
 	override def configure(): Unit = {
 		bind[RulesInterface].to[RulesBase]
-		bindModule[PlayerInterface, PlayerBase, PlayerFactory]
+		bindFactory[PlayerInterface, PlayerBase, PlayerFactory]
 		bind[BoardInterface].to[Board]
 		bind[ControllerInterface].to[Controller]
 	}
