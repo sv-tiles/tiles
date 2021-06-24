@@ -27,7 +27,7 @@ class FileIoXmlSpec extends AnyWordSpec with Matchers {
 
 			loadResult.get shouldBe board
 		}
-		"save and load an full board" in {
+		"save and load a full board" in {
 			val boringtile = Tile(Terrain.Plains)
 
 			val player = PlayerBase("test1", Color.Red)

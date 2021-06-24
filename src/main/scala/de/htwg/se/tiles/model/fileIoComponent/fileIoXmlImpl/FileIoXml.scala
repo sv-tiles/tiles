@@ -23,11 +23,6 @@ case class FileIoXml @Inject()() extends FileIoInterface {
 }
 
 private object FileIoXml {
-	private val injector: Injector = Guice.createInjector(GameModule())
-	private val playerFactory = injector.getInstance(classOf[PlayerFactory])
-	private val tileFactory = injector.getInstance(classOf[TileFactory])
-	private val boardFactory = new BoardFactory() {} // injector.getInstance(classOf[BoardFactory]) // TODO Fix
-
 	implicit class BoardInterfaceXML(boardInterface: BoardInterface) {
 		def toXml: Elem = <board>
 			<current-player>
@@ -119,6 +114,11 @@ private object FileIoXml {
 	}
 
 	implicit class ElemXML(elem: Node) {
+		private val injector: Injector = Guice.createInjector(GameModule())
+		private val playerFactory: PlayerFactory = injector.getInstance(classOf[PlayerFactory])
+		private val tileFactory: TileFactory = injector.getInstance(classOf[TileFactory])
+		private val boardFactory: BoardFactory = new BoardFactory() {} // injector.getInstance(classOf[BoardFactory]) // TODO Fix
+
 		def toBoard: Try[BoardInterface] = Try {
 			val currentPlayer = (elem \ "current-player").head.text.trim.toInt
 			val players = (elem \ "players" \ "player").map(player => player.toPlayer.get).toVector
@@ -162,8 +162,8 @@ private object FileIoXml {
 			Position(x, y)
 		}
 
-		def stringToTerrain(str: String): Try[Terrain] = Try(Terrain.defaults.find(t => t.getClass.getSimpleName == str).get)
+		private def stringToTerrain(str: String): Try[Terrain] = Try(Terrain.defaults.find(t => t.getClass.getSimpleName == str).get)
 
-		def stringToDirection(str: String): Try[Direction] = Try(Direction.all.find(d => d.getClass.getSimpleName == str).get)
+		private def stringToDirection(str: String): Try[Direction] = Try(Direction.all.find(d => d.getClass.getSimpleName == str).get)
 	}
 }
