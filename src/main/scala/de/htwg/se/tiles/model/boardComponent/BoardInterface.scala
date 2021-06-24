@@ -18,7 +18,7 @@ trait BoardInterface {
 
 	def players: Vector[PlayerInterface]
 
-	def getCurrentPlayer: PlayerInterface
+	def getCurrentPlayer: Option[PlayerInterface]
 
 	def rotateCurrentTile(clockwise: Boolean = true): BoardInterface
 

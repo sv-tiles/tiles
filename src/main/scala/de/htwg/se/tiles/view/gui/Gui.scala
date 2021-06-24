@@ -12,6 +12,7 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Polygon, Polyline, Rectangle, Shape}
 import scalafx.scene.text.Text
 import scalafx.scene.{Group, Scene}
+import scalafx.stage.FileChooser
 
 
 class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Boolean, String)] {
@@ -57,6 +58,22 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 											controller.addPlayer(name)
 											update()
 										})
+									},
+									new MenuItem("Save") {
+										onAction = _ => {
+											val file = new FileChooser().showSaveDialog(stage)
+											if (file != null) {
+												controller.save(file.getAbsolutePath)
+											}
+										}
+									},
+									new MenuItem("Load") {
+										onAction = _ => {
+											val file = new FileChooser().showOpenDialog(stage)
+											if (file != null) {
+												controller.load(file.getAbsolutePath)
+											}
+										}
 									}
 								)
 							}
@@ -111,12 +128,12 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 			return
 		}
 
-		player.text = "Player: " + controller.board.getCurrentPlayer.name
+		player.text = "Player: " + controller.board.getCurrentPlayer.get.name
 
 		if (value._2.nonEmpty) {
 			info.text = value._2
 			infoTime = System.currentTimeMillis()
-		} else if (System.currentTimeMillis() - infoTime > 1000) {
+		} else if (System.currentTimeMillis() - infoTime > 5000) {
 			info.text = "-"
 		}
 		Platform.runLater(() => {

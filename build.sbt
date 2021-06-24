@@ -27,6 +27,9 @@ lazy val javaFXModules = {
 
 libraryDependencies ++= javaFXModules
 
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.0.0"
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2"
+
 Compile / resourceDirectory := baseDirectory.value / "src/main/resources"
 
 coverageExcludedPackages := "de\\.htwg\\.se\\.tiles\\.view\\.gui;.*Game"

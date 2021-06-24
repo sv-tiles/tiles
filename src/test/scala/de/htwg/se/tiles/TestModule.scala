@@ -4,6 +4,8 @@ import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
 import de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl.Controller
 import de.htwg.se.tiles.model.boardComponent.BoardInterface
 import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.Board
+import de.htwg.se.tiles.model.fileIoComponent.FileIoInterface
+import de.htwg.se.tiles.model.fileIoComponent.fileIoJsonImpl.FileIoJson
 import de.htwg.se.tiles.model.playerComponent.playerBaseImpl.PlayerBase
 import de.htwg.se.tiles.model.playerComponent.{PlayerFactory, PlayerInterface}
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
@@ -14,6 +16,7 @@ case class TestModule() extends ScalaFactoryModule {
 		bind[RulesInterface].to[RulesFake]
 		bindFactory[PlayerInterface, PlayerBase, PlayerFactory]
 		bind[BoardInterface].to[Board]
+		bind[FileIoInterface].to[FileIoJson]
 		bind[ControllerInterface].to[Controller]
 	}
 }

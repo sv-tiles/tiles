@@ -11,7 +11,7 @@ import scala.util.{Failure, Success, Try}
 
 
 // @throws[IllegalArgumentException]
-case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer: Int = 0, tiles: HashMap[Position, Tile] = new HashMap[Position, Tile](), currentTile: Option[TileInterface] = Option(TileBuilder.randomTile()), currentPos: Option[Position] = Option.empty) extends BoardInterface {
+case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer: Int = 0, tiles: HashMap[Position, TileInterface] = new HashMap[Position, Tile](), currentTile: Option[TileInterface] = Option(TileBuilder.randomTile()), currentPos: Option[Position] = Option.empty) extends BoardInterface {
 	require(currentTile.isEmpty ^ currentPos.isEmpty, "current tile XOR current pos! (" + currentTile.isDefined + ", " + currentPos.isDefined + ")")
 	require(currentPos.isEmpty || tiles.contains(currentPos.get), "At current pos has to be a tile")
 	require(currentPlayer == 0 || (currentPlayer >= 0 && currentPlayer < players.length))
@@ -23,7 +23,7 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 
 	override def getTileBuilder: TileBuilderInterface = TileBuilder
 
-	override def getCurrentPlayer: PlayerInterface = players(currentPlayer)
+	override def getCurrentPlayer: Option[PlayerInterface] = Try(players(currentPlayer)).toOption
 
 	override def rotateCurrentTile(clockwise: Boolean = true): Board = if (currentTile.isDefined)
 		copy(currentTile = currentTile.map(t => t.rotate(clockwise))) else
@@ -66,7 +66,7 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 		rules.evaluatePoints(copy(
 			currentPos = Option.empty,
 			currentTile = Option(rules.randomPlaceable(this)),
-			players = people.fold(players)(d => players.updated(currentPlayer, getCurrentPlayer.setPeople(getCurrentPlayer.people.appended((currentPos.get, d))))),
+			players = people.fold(players)(d => players.updated(currentPlayer, getCurrentPlayer.get.setPeople(getCurrentPlayer.get.people.appended((currentPos.get, d))))),
 			currentPlayer = (currentPlayer + 1) % players.length
 		))
 	})

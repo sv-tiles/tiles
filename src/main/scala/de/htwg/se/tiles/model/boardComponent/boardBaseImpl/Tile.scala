@@ -1,5 +1,7 @@
 package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
+import com.google.inject.Inject
+import com.google.inject.assistedinject.Assisted
 import de.htwg.se.tiles.model.Direction
 import de.htwg.se.tiles.model.boardComponent.{Terrain, TileInterface}
 
@@ -11,7 +13,7 @@ object Tile {
 	def apply(center: Terrain, border: Terrain): Tile = Tile(border, border, border, border, center)
 }
 
-case class Tile(north: Terrain, east: Terrain, south: Terrain, west: Terrain, center: Terrain) extends TileInterface {
+case class Tile @Inject()(@Assisted("north") north: Terrain, @Assisted("east") east: Terrain, @Assisted("south") south: Terrain, @Assisted("west") west: Terrain, @Assisted("center") center: Terrain) extends TileInterface {
 
 	override def rotate(clockwise: Boolean = true): Tile = if (clockwise)
 		copy(north = west, east = north, south = east, west = south) else

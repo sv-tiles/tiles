@@ -12,6 +12,10 @@ trait ControllerInterface extends Observable[(Boolean, String)] {
 
 	def addPlayer(name: String, color: Color = Color.Black): Unit
 
+	def load(file: String): Unit
+
+	def save(file: String): Unit
+
 	def clear(): Unit
 
 	def placeTile(pos: (Int, Int)): Unit

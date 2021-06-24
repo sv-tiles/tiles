@@ -5,6 +5,7 @@ import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
 import de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl.Controller
 import de.htwg.se.tiles.model.boardComponent.BoardInterface
 import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.Board
+import de.htwg.se.tiles.model.fileIoComponent.FileIoInterface
 import de.htwg.se.tiles.model.playerComponent.PlayerFactory
 import de.htwg.se.tiles.model.playerComponent.playerBaseImpl.PlayerBase
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
@@ -30,9 +31,10 @@ class GameModuleSpec extends AnyWordSpec with Matchers {
 			val board = injector.getInstance(classOf[BoardInterface])
 			val rules = injector.getInstance(classOf[RulesInterface])
 			val playerFactory = injector.getInstance(classOf[PlayerFactory])
+			val fileIo = injector.getInstance(classOf[FileIoInterface])
 
 			val injected = injector.getInstance(classOf[ControllerInterface])
-			val handmade = new Controller(board, rules, playerFactory)
+			val handmade = new Controller(board, rules, playerFactory, fileIo)
 
 			injected.board shouldBe handmade.board
 

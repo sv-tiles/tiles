@@ -97,6 +97,8 @@ class Tui(controller: ControllerInterface, var width: Int, var height: Int, var 
 					this.height = height.toInt
 				case "size" => result = Option("Size: " + width + " " + height)
 				case "exit" => result = Option("stopping")
+				case s"save $file" => controller.save(file)
+				case s"load $file" => controller.load(file)
 				case _ => result = Option("Unknown command: " + command)
 			}
 			update((true, ""))
@@ -130,7 +132,7 @@ class Tui(controller: ControllerInterface, var width: Int, var height: Int, var 
 		if (controller.board.players.isEmpty) {
 			println(Console.RED + "No players!\n" + Console.RESET + "addPlayer <name>")
 		} else {
-			println("Player: " + Console.BOLD + controller.board.getCurrentPlayer.name + Console.RESET)
+			println("Player: " + Console.BOLD + controller.board.getCurrentPlayer.get.name + Console.RESET)
 		}
 	}
 

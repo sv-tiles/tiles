@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
 import de.htwg.se.tiles.model._
 import de.htwg.se.tiles.model.boardComponent.BoardInterface
+import de.htwg.se.tiles.model.fileIoComponent.FileIoInterface
 import de.htwg.se.tiles.model.playerComponent.PlayerFactory
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 import de.htwg.se.tiles.util.UndoManager
@@ -12,11 +13,17 @@ import scalafx.scene.paint.Color
 import scala.util.{Success, Try}
 
 
-class Controller @Inject()(var board: BoardInterface, var rules: RulesInterface, playerFactory: PlayerFactory, var undoManager: UndoManager = new UndoManager()) extends ControllerInterface {
+class Controller @Inject()(var board: BoardInterface, var rules: RulesInterface, var playerFactory: PlayerFactory, var fileIo: FileIoInterface, var undoManager: UndoManager = new UndoManager()) extends ControllerInterface {
 	override def addPlayer(name: String, color: Color = Color.Black): Unit = {
 		board = board.updatePlayers(board.players.appended(playerFactory.create(name, color)))
 		notifyObservers((true, ""))
 	}
+
+	override def load(file: String): Unit = notifyObservers(Try({
+		board = fileIo.load(file).get
+	}).fold(err => (false, "Error:\n" + err.getMessage), _ => (true, "Success")))
+
+	override def save(file: String): Unit = notifyObservers(fileIo.save(file, board).fold(err => (false, "Error:\n" + err.getMessage), _ => (true, "Success")))
 
 	override def clear(): Unit = {
 		undoManager.execute(new ClearCommand(this))
@@ -29,13 +36,13 @@ class Controller @Inject()(var board: BoardInterface, var rules: RulesInterface,
 	override def placeTile(pos: Position): Unit =
 		undoManager.execute(new PlaceTileCommand(this, pos)).fold(
 			e => notifyObservers((false, e.getMessage)),
-			a => notifyObservers((true, ""))
+			_ => notifyObservers((true, ""))
 		)
 
 	override def pickUpTile(): Unit =
 		undoManager.execute(new PickUpTileCommand(this)).fold(
 			e => notifyObservers((false, e.getMessage)),
-			a => notifyObservers((true, ""))
+			_ => notifyObservers((true, ""))
 		)
 
 	override def rotate(clockwise: Boolean): Unit = {

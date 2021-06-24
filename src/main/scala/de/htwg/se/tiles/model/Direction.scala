@@ -15,4 +15,5 @@ object Direction {
 
 	/** Without Center */
 	val allDirections: Iterable[Direction] = List(North, East, South, West)
+	val all: Iterable[Direction] = List(North, East, South, West, Center)
 }
