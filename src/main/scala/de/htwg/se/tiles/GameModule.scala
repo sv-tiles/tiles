@@ -5,7 +5,7 @@ import de.htwg.se.tiles.control.controllerComponent.controllerBaseImpl.Controlle
 import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.{Board, Tile}
 import de.htwg.se.tiles.model.boardComponent.{BoardInterface, TileFactory, TileInterface}
 import de.htwg.se.tiles.model.fileIoComponent.FileIoInterface
-import de.htwg.se.tiles.model.fileIoComponent.fileIoXmlImpl.FileIoXml
+import de.htwg.se.tiles.model.fileIoComponent.fileIoJsonImpl.FileIoJson
 import de.htwg.se.tiles.model.playerComponent.playerBaseImpl.PlayerBase
 import de.htwg.se.tiles.model.playerComponent.{PlayerFactory, PlayerInterface}
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
@@ -17,7 +17,7 @@ case class GameModule() extends ScalaFactoryModule {
 		bindFactory[PlayerInterface, PlayerBase, PlayerFactory]
 		bindFactory[TileInterface, Tile, TileFactory]
 		bind[BoardInterface].to[Board]
-		bind[FileIoInterface].to[FileIoXml]
+		bind[FileIoInterface].to[FileIoJson]
 		bind[ControllerInterface].to[Controller]
 	}
 }
