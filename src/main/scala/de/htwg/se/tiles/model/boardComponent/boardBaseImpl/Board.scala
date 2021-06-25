@@ -121,4 +121,7 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 
 		(if (frame) "+" + "-" * mapWidth + "+\n" else "") + text + (if (frame) "+" + "-" * mapWidth + "+" else "")
 	}
+
+	override def create(players: Vector[PlayerInterface], currentPlayer: Int, tiles: HashMap[Position, TileInterface], currentTile: Option[TileInterface], currentPos: Option[Position]): BoardInterface =
+		copy(players = players, currentPlayer = currentPlayer, tiles = tiles, currentTile = currentTile, currentPos = currentPos)
 }

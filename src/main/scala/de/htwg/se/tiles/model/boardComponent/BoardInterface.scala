@@ -37,4 +37,6 @@ trait BoardInterface {
 	def clear: BoardInterface
 
 	def updatePlayers(players: Vector[PlayerInterface]): BoardInterface
+
+	def create(players: Vector[PlayerInterface], currentPlayer: Int, tiles: HashMap[Position, TileInterface], currentTile: Option[TileInterface], currentPos: Option[Position]): BoardInterface
 }

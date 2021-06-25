@@ -117,7 +117,6 @@ private object FileIoXml {
 		private val injector: Injector = Guice.createInjector(GameModule())
 		private val playerFactory: PlayerFactory = injector.getInstance(classOf[PlayerFactory])
 		private val tileFactory: TileFactory = injector.getInstance(classOf[TileFactory])
-		private val boardFactory: BoardFactory = new BoardFactory() {} // injector.getInstance(classOf[BoardFactory]) // TODO Fix
 
 		def toBoard: Try[BoardInterface] = Try {
 			val currentPlayer = (elem \ "current-player").head.text.trim.toInt
@@ -129,7 +128,7 @@ private object FileIoXml {
 			val currentPosNode = (elem \ "current-pos").head
 			val currentPos = if (currentPosNode.text.trim == "") Option.empty else Option((currentPosNode \ "position").head.toPosition.get)
 
-			boardFactory.create(players, currentPlayer, tiles, currentTile, currentPos)
+			injector.getInstance(classOf[BoardInterface]).create(players, currentPlayer, tiles, currentTile, currentPos)
 		}
 
 		def toPlayer: Try[PlayerInterface] = Try {
