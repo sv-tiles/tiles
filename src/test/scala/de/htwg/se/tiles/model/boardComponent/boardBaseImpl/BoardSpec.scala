@@ -108,13 +108,13 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			}
 			"place it" in {
 				val board1 = Board(tiles = new HashMap().updated(Position(0, 0), tile1), currentTile = Option.empty, currentPos = Option(Position(0, 0)))
-				board1.placeCurrentTile(Position(10, 10)).get shouldBe board1.copy(tiles = new HashMap().updated(Position(10, 10), tile1), currentPos = Option(Position(10, 10)))
+				board1.placeCurrentTile(Position(10, 10)).get shouldBe board1.create(tiles = new HashMap().updated(Position(10, 10), tile1), currentPos = Option(Position(10, 10)))
 
 				val board2 = Board(tiles = new HashMap(), currentTile = Option(tile1), currentPos = Option.empty)
-				board2.placeCurrentTile(Position(10, 10)).get shouldBe board2.copy(tiles = board2.tiles.updated(Position(10, 10), tile1), currentPos = Option(Position(10, 10)), currentTile = Option.empty)
+				board2.placeCurrentTile(Position(10, 10)).get shouldBe board2.create(tiles = board2.tiles.updated(Position(10, 10), tile1), currentPos = Option(Position(10, 10)), currentTile = Option.empty)
 
 				val board3 = Board(tiles = new HashMap().updated(Position(0, 0), tile1), currentTile = Option(tile2), currentPos = Option.empty)
-				board3.placeCurrentTile(Position(10, 10)).get shouldBe board3.copy(tiles = board3.tiles.updated(Position(10, 10), tile2), currentPos = Option(Position(10, 10)), currentTile = Option.empty)
+				board3.placeCurrentTile(Position(10, 10)).get shouldBe board3.create(tiles = board3.tiles.updated(Position(10, 10), tile2), currentPos = Option(Position(10, 10)), currentTile = Option.empty)
 			}
 		}
 		"pickup current tile" should {
@@ -125,19 +125,19 @@ class BoardSpec extends AnyWordSpec with Matchers {
 				board2.pickupCurrentTile().isFailure shouldBe true
 			}
 			"work" in {
-				board1.pickupCurrentTile().get shouldBe board1.copy(tiles = board1.tiles.removed(Position(0, 0)), currentPos = Option.empty, currentTile = Option(tile))
+				board1.pickupCurrentTile().get shouldBe board1.create(tiles = board1.tiles.removed(Position(0, 0)), currentPos = Option.empty, currentTile = Option(tile))
 			}
 		}
 		"rotate current tile" should {
 			val tile1 = boardBaseImpl.Tile(Terrain.Hills, Terrain.Plains, Terrain.Mountains, Terrain.Water, Terrain.Forest)
 			"rotate the tile" in {
 				val board1 = Board(tiles = new HashMap().updated(Position(0, 0), tile1), currentTile = Option.empty, currentPos = Option(Position(0, 0)))
-				board1.rotateCurrentTile(true) shouldBe board1.copy(tiles = new HashMap().updated(Position(0, 0), tile1.rotate(true)))
-				board1.rotateCurrentTile(false) shouldBe board1.copy(tiles = new HashMap().updated(Position(0, 0), tile1.rotate(false)))
+				board1.rotateCurrentTile(true) shouldBe board1.create(tiles = new HashMap().updated(Position(0, 0), tile1.rotate(true)))
+				board1.rotateCurrentTile(false) shouldBe board1.create(tiles = new HashMap().updated(Position(0, 0), tile1.rotate(false)))
 
 				val board2 = Board(tiles = new HashMap(), currentTile = Option(tile1), currentPos = Option.empty)
-				board2.rotateCurrentTile(true) shouldBe board2.copy(currentTile = Option(tile1.rotate(true)))
-				board2.rotateCurrentTile(false) shouldBe board2.copy(currentTile = Option(tile1.rotate(false)))
+				board2.rotateCurrentTile(true) shouldBe board2.create(currentTile = Option(tile1.rotate(true)))
+				board2.rotateCurrentTile(false) shouldBe board2.create(currentTile = Option(tile1.rotate(false)))
 			}
 		}
 		"commit" should {
@@ -165,7 +165,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 			"generate a new current tile and discard current pos" in {
 				val board = Board(tiles = new HashMap().updated(Position(0, 0), tile1), currentTile = Option.empty, currentPos = Option(Position(0, 0)), players = Vector().appended(PlayerBase("test", Color.Black)))
 				val committed = board.commit(rules).get
-				committed shouldBe board.copy(currentPos = Option.empty, currentTile = committed.currentTile)
+				committed shouldBe board.create(currentPos = Option.empty, currentTile = committed.currentTile)
 				committed.currentTile should not be Option.empty
 			}
 			"place people" in {
@@ -188,7 +188,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 		"have equivalent no-args apply and constructor methods" in {
 			val b1 = Board.apply()
 			val b2 = new Board()
-			b1.copy(currentTile = b2.currentTile) shouldBe b2
+			b1.create(currentTile = b2.currentTile) shouldBe b2
 		}
 	}
 }

@@ -1,15 +1,15 @@
 package de.htwg.se.tiles.model.fileIoComponent.fileIoXmlImpl
 
-import de.htwg.se.tiles.model.boardComponent.Terrain
 import de.htwg.se.tiles.model.boardComponent.boardBaseImpl.{Board, Tile, TileBuilder}
+import de.htwg.se.tiles.model.boardComponent.{Island, Terrain}
 import de.htwg.se.tiles.model.playerComponent.playerBaseImpl.PlayerBase
-import de.htwg.se.tiles.model.{Direction, Position}
+import de.htwg.se.tiles.model.{Direction, Position, SubPosition}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import scalafx.scene.paint.Color
 
 import java.io.File
-import scala.collection.immutable.HashMap
+import scala.collection.immutable.{HashMap, HashSet}
 
 class FileIoXmlSpec extends AnyWordSpec with Matchers {
 	"A FileIoXml" should {
@@ -37,7 +37,8 @@ class FileIoXmlSpec extends AnyWordSpec with Matchers {
 				currentPlayer = 1,
 				currentTile = Option(TileBuilder.randomTile()),
 				currentPos = Option.empty,
-				tiles = HashMap().updated(Position(0, 0), boringtile).updated(Position(1, 0), boringtile).updated(Position(0, 1), boringtile)
+				tiles = HashMap().updated(Position(0, 0), boringtile).updated(Position(1, 0), boringtile).updated(Position(0, 1), boringtile),
+				islands = Vector(Island(HashSet(SubPosition(Position(0, 0), Direction.Center)), complete = false, 1, HashSet(player.name)))
 			)
 
 			fio.save("out/full.xml", board).isSuccess shouldBe true

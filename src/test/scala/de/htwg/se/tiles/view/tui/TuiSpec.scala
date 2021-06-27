@@ -191,7 +191,7 @@ class TuiSpec extends AnyWordSpec with Matchers {
 				val tui = new Tui(controller, width, height, scale, (0, 0))
 
 				tui.command("clear")
-				controller.board shouldBe Board().copy(currentTile = controller.board.currentTile)
+				controller.board shouldBe Board().create(currentTile = controller.board.currentTile)
 			}
 			"undo redo" in {
 				val controller = new Controller(Board(), RulesFake(), playerGenerator, fileIo = fileIo)

@@ -1,7 +1,7 @@
 package de.htwg.se.tiles.model.boardComponent.boardBaseImpl
 
 import com.google.inject.Inject
-import de.htwg.se.tiles.model.boardComponent.{BoardInterface, TileBuilderInterface, TileInterface}
+import de.htwg.se.tiles.model.boardComponent.{BoardInterface, Island, TileBuilderInterface, TileInterface}
 import de.htwg.se.tiles.model.playerComponent.PlayerInterface
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 import de.htwg.se.tiles.model.{Direction, Position}
@@ -11,7 +11,7 @@ import scala.util.{Failure, Success, Try}
 
 
 // @throws[IllegalArgumentException]
-case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer: Int = 0, tiles: HashMap[Position, TileInterface] = new HashMap[Position, Tile](), currentTile: Option[TileInterface] = Option(TileBuilder.randomTile()), currentPos: Option[Position] = Option.empty) extends BoardInterface {
+case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer: Int = 0, tiles: HashMap[Position, TileInterface] = new HashMap[Position, Tile](), currentTile: Option[TileInterface] = Option(TileBuilder.randomTile()), currentPos: Option[Position] = Option.empty, islands: Vector[Island] = Vector.empty) extends BoardInterface {
 	require(currentTile.isEmpty ^ currentPos.isEmpty, "current tile XOR current pos! (" + currentTile.isDefined + ", " + currentPos.isDefined + ")")
 	require(currentPos.isEmpty || tiles.contains(currentPos.get), "At current pos has to be a tile")
 	require(currentPlayer == 0 || (currentPlayer >= 0 && currentPlayer < players.length))
@@ -25,32 +25,32 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 
 	override def getCurrentPlayer: Option[PlayerInterface] = Try(players(currentPlayer)).toOption
 
-	override def rotateCurrentTile(clockwise: Boolean = true): Board = if (currentTile.isDefined)
-		copy(currentTile = currentTile.map(t => t.rotate(clockwise))) else
-		copy(tiles = tiles.updated(currentPos.get, tiles(currentPos.get).rotate(clockwise)))
+	override def rotateCurrentTile(clockwise: Boolean = true): BoardInterface = if (currentTile.isDefined)
+		create(currentTile = currentTile.map(t => t.rotate(clockwise))) else
+		create(tiles = tiles.updated(currentPos.get, tiles(currentPos.get).rotate(clockwise)))
 
-	override def placeCurrentTile(pos: Position): Try[Board] = {
+	override def placeCurrentTile(pos: Position): Try[BoardInterface] = {
 		if (currentTile.isDefined) {
-			place(pos, currentTile.get).map(b => b.copy(currentTile = Option.empty, currentPos = Option(pos)))
+			place(pos, currentTile.get).map(b => b.create(currentTile = Option.empty, currentPos = Option(pos)))
 		} else if (pos == currentPos.get) {
 			Success(this)
 		} else {
-			place(pos, tiles(currentPos.get)).map(placed => placed.copy(tiles = placed.tiles.removed(currentPos.get), currentPos = Option(pos)))
+			place(pos, tiles(currentPos.get)).map(placed => placed.create(tiles = placed.tiles.removed(currentPos.get), currentPos = Option(pos)))
 		}
 	}
 
-	override def pickupCurrentTile(): Try[Board] = Try {
+	override def pickupCurrentTile(): Try[BoardInterface] = Try {
 		if (currentPos.isEmpty) {
 			return Failure(PlacementException("Current tile not placed"))
 		}
-		copy(tiles = tiles.removed(currentPos.get), currentTile = Option(tiles(currentPos.get)), currentPos = Option.empty)
+		create(tiles = tiles.removed(currentPos.get), currentTile = Option(tiles(currentPos.get)), currentPos = Option.empty)
 	}
 
-	override def place(pos: Position, tile: TileInterface): Try[Board] = Try {
+	override def place(pos: Position, tile: TileInterface): Try[BoardInterface] = Try {
 		if (tiles.contains(pos)) {
 			return Failure(PlacementException("Already occupied"))
 		}
-		copy(tiles = tiles.updated(pos, Tile(tile.north, tile.east, tile.south, tile.west, tile.center)))
+		create(tiles = tiles.updated(pos, Tile(tile.north, tile.east, tile.south, tile.west, tile.center)))
 	}
 
 	override def commit(rules: RulesInterface, people: Option[Direction] = Option.empty): Try[BoardInterface] = rules.canPlace(this).flatMap(canPlace => Try {
@@ -63,7 +63,7 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 		if (players.isEmpty) {
 			return Failure(PlacementException("No players"))
 		}
-		rules.evaluatePoints(copy(
+		rules.evaluatePoints(create(
 			currentPos = Option.empty,
 			currentTile = Option(rules.randomPlaceable(this)),
 			players = people.fold(players)(d => players.updated(currentPlayer, getCurrentPlayer.get.setPeople(getCurrentPlayer.get.people.appended((currentPos.get, d))))),
@@ -71,7 +71,7 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 		))
 	})
 
-	override def updatePlayers(players: Vector[PlayerInterface]): BoardInterface = copy(players = players)
+	override def updatePlayers(players: Vector[PlayerInterface]): BoardInterface = create(players = players)
 
 	override def boardToString: String = {
 		if (tiles.isEmpty) {
@@ -122,6 +122,6 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 		(if (frame) "+" + "-" * mapWidth + "+\n" else "") + text + (if (frame) "+" + "-" * mapWidth + "+" else "")
 	}
 
-	override def create(players: Vector[PlayerInterface], currentPlayer: Int, tiles: HashMap[Position, TileInterface], currentTile: Option[TileInterface], currentPos: Option[Position]): BoardInterface =
-		copy(players = players, currentPlayer = currentPlayer, tiles = tiles, currentTile = currentTile, currentPos = currentPos)
+	override def create(players: Vector[PlayerInterface] = players, currentPlayer: Int = currentPlayer, tiles: HashMap[Position, TileInterface] = tiles, currentTile: Option[TileInterface] = currentTile, currentPos: Option[Position] = currentPos, islands: Vector[Island] = islands): BoardInterface =
+		Board(players = players, currentPlayer = currentPlayer, tiles = tiles, currentTile, currentPos = currentPos, islands = islands)
 }

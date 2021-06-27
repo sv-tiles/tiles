@@ -1,7 +1,7 @@
 package de.htwg.se.tiles.model.rulesComponent
 
-import de.htwg.se.tiles.model.Position
-import de.htwg.se.tiles.model.boardComponent.{BoardInterface, TileInterface}
+import de.htwg.se.tiles.model.boardComponent.{BoardInterface, Island, TileInterface}
+import de.htwg.se.tiles.model.{Position, SubPosition}
 
 import scala.collection.immutable.HashMap
 import scala.util.{Failure, Try}
@@ -19,4 +19,6 @@ trait RulesInterface {
 	def randomPlaceable(b: BoardInterface): TileInterface
 
 	def evaluatePoints(b: BoardInterface): BoardInterface
+
+	def findIsland(b: BoardInterface, start: SubPosition): Island
 }

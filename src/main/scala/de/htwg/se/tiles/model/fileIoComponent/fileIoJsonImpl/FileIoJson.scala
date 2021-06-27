@@ -6,11 +6,11 @@ import de.htwg.se.tiles.model.boardComponent._
 import de.htwg.se.tiles.model.fileIoComponent.FileIoInterface
 import de.htwg.se.tiles.model.fileIoComponent.fileIoJsonImpl.FileIoJson.{BoardInterfaceJson, JsValueJson}
 import de.htwg.se.tiles.model.playerComponent.{PlayerFactory, PlayerInterface}
-import de.htwg.se.tiles.model.{Direction, Position}
+import de.htwg.se.tiles.model.{Direction, Position, SubPosition}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import scalafx.scene.paint.Color
 
-import scala.collection.immutable.HashMap
+import scala.collection.immutable.{HashMap, HashSet}
 import scala.util.Try
 
 case class FileIoJson @Inject()() extends FileIoInterface {
@@ -22,11 +22,12 @@ case class FileIoJson @Inject()() extends FileIoInterface {
 private object FileIoJson {
 	implicit class BoardInterfaceJson(boardInterface: BoardInterface) {
 		def toJson: JsObject = Json.obj(
-			"currentPlayer" -> boardInterface.getCurrentPlayer.fold(0)(cp => boardInterface.players.indexOf(cp)),
+			"currentPlayer" -> boardInterface.currentPlayer,
 			"players" -> boardInterface.players.map(p => p.toJson),
 			"currentTile" -> boardInterface.currentTile.map[Json.JsValueWrapper](t => t.toJson).getOrElse(""),
 			"tileMap" -> boardInterface.tiles.map(e => Json.obj("position" -> e._1.toJson, "tile" -> e._2.toJson)),
-			"currentPos" -> boardInterface.currentPos.map[Json.JsValueWrapper](p => p.toJson).getOrElse("")
+			"currentPos" -> boardInterface.currentPos.map[Json.JsValueWrapper](p => p.toJson).getOrElse(""),
+			"islands" -> boardInterface.islands.map(i => i.toJson)
 		)
 	}
 
@@ -68,6 +69,22 @@ private object FileIoJson {
 		)
 	}
 
+	implicit class SubPositionJson(subPosition: SubPosition) {
+		def toJson: JsObject = Json.obj(
+			"position" -> subPosition.position.toJson,
+			"direction" -> subPosition.direction.toJson
+		)
+	}
+
+	implicit class IslandJson(island: Island) {
+		def toJson: JsObject = Json.obj(
+			"content" -> island.content.map(c => c.toJson),
+			"complete" -> island.complete,
+			"value" -> island.value.intValue,
+			"owners" -> island.owners
+		)
+	}
+
 	implicit class JsValueJson(json: JsValue) {
 		private val injector: Injector = Guice.createInjector(GameModule())
 		private val playerFactory: PlayerFactory = injector.getInstance(classOf[PlayerFactory])
@@ -82,8 +99,9 @@ private object FileIoJson {
 			val currentTile = if (currentTileNode.toString() == "\"\"") Option.empty else Option(currentTileNode.toTile.get)
 			val currentPosNode = (json \ "currentPos").get
 			val currentPos = if (currentPosNode.toString() == "\"\"") Option.empty else Option(currentPosNode.toPosition.get)
+			val islands = (json \ "islands").as[List[JsValue]].map(island => island.toIsland.get).toVector
 
-			injector.getInstance(classOf[BoardInterface]).create(players, currentPlayer, tiles, currentTile, currentPos)
+			injector.getInstance(classOf[BoardInterface]).create(players, currentPlayer, tiles, currentTile, currentPos, islands)
 		}
 
 		def toPlayer: Try[PlayerInterface] = Try {
@@ -114,6 +132,21 @@ private object FileIoJson {
 			val y = (json \ "y").get.toString().toInt
 
 			Position(x, y)
+		}
+
+		def toSubPosition: Try[SubPosition] = Try {
+			val position = (json \ "position").get.toPosition.get
+			val direction = stringToDirection((json \ "direction").get.as[String]).get
+
+			SubPosition(position, direction)
+		}
+
+		def toIsland: Try[Island] = Try {
+			val content = HashSet.from((json \ "content").as[List[JsValue]].map(v => v.toSubPosition.get))
+			val complete = (json \ "complete").as[Boolean]
+			val value = (json \ "value").as[Int]
+			val owners = HashSet.from((json \ "owners").as[List[String]])
+			Island(content, complete, value, owners)
 		}
 
 		private def stringToTerrain(str: String): Try[Terrain] = Try(Terrain.defaults.find(t => t.getClass.getSimpleName == str).get)
