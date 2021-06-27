@@ -33,7 +33,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 		"clear board" in {
 			val controller = new Controller(board = board, rules = RulesFake(), playerFactory = playerGenerator, fileIo = fileIo)
 			controller.clear()
-			controller.board shouldBe Board().copy(currentTile = controller.board.currentTile, players = board.players)
+			controller.board shouldBe Board().create(currentTile = controller.board.currentTile, players = board.players)
 		}
 		"place tiles" in {
 			val controller = new Controller(board, RulesFake(), playerFactory = playerGenerator, fileIo = fileIo)
@@ -61,7 +61,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			val board2 = board.placeCurrentTile(Position(10, 10)).get
 			controller.placeTile((10, 10))
 			controller.commit(Option.empty)
-			controller.board shouldBe board2.commit(controller.rules).get.asInstanceOf[Board].copy(currentTile = controller.board.currentTile)
+			controller.board shouldBe board2.commit(controller.rules).get.asInstanceOf[Board].create(currentTile = controller.board.currentTile)
 		}
 		"print map as string" in {
 			val controller = new Controller(board, RulesFake(), playerFactory = playerGenerator, fileIo = fileIo)

@@ -1,8 +1,8 @@
 package de.htwg.se.tiles.view.gui
 
 import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
-import de.htwg.se.tiles.model.Position
 import de.htwg.se.tiles.model.boardComponent.{Terrain, TileInterface}
+import de.htwg.se.tiles.model.{Direction, Position}
 import de.htwg.se.tiles.util.{Observer, Position2D}
 import scalafx.application.{JFXApp3, Platform}
 import scalafx.scene.control._
@@ -141,8 +141,20 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 			pane.children = controller.board.tiles.map(t => new Group {
 				private val (pos, tile) = t
 				private val screenPos = boardToLocal(pos)
+				this.setUserData(t)
 				children = generatePolygons(tile, screenPos, size)
 				if (controller.board.currentPos.contains(pos)) {
+					children.foreach(n => {
+						n.setOnMouseEntered(e => {
+							n.setOpacity(0.5)
+							println(n.getUserData)
+						})
+						n.setOnMouseExited(e => {
+							n.setOpacity(1.0)
+						})
+						n.setOnMouseClicked(e => println("click"))
+					})
+
 					children.add(new Polyline {
 						points.addAll(
 							screenPos.x,
@@ -252,6 +264,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				pos.y
 			)
 			fill = colorOf(tile.north)
+			userData = Direction.North
 		},
 		new Polygon {
 			points.addAll(
@@ -265,6 +278,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				pos.y + size
 			)
 			fill = colorOf(tile.east)
+			userData = Direction.East
 		},
 		new Polygon {
 			points.addAll(
@@ -278,6 +292,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				pos.y + size
 			)
 			fill = colorOf(tile.south)
+			userData = Direction.South
 		},
 		new Polygon {
 			points.addAll(
@@ -291,6 +306,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				pos.y + size
 			)
 			fill = colorOf(tile.west)
+			userData = Direction.West
 		},
 		new Rectangle {
 			x = pos.x +.2 * size
@@ -298,6 +314,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 			width = size * .6
 			height = size * .6
 			fill = colorOf(tile.center)
+			userData = Direction.Center
 		}
 	)
 }

@@ -6,10 +6,10 @@ import de.htwg.se.tiles.model.boardComponent._
 import de.htwg.se.tiles.model.fileIoComponent.FileIoInterface
 import de.htwg.se.tiles.model.fileIoComponent.fileIoXmlImpl.FileIoXml.{BoardInterfaceXML, ElemXML}
 import de.htwg.se.tiles.model.playerComponent.{PlayerFactory, PlayerInterface}
-import de.htwg.se.tiles.model.{Direction, Position}
+import de.htwg.se.tiles.model.{Direction, Position, SubPosition}
 import scalafx.scene.paint.Color
 
-import scala.collection.immutable.HashMap
+import scala.collection.immutable.{HashMap, HashSet}
 import scala.util.Try
 import scala.xml.{Elem, Node, PrettyPrinter, XML}
 
@@ -26,7 +26,7 @@ private object FileIoXml {
 	implicit class BoardInterfaceXML(boardInterface: BoardInterface) {
 		def toXml: Elem = <board>
 			<current-player>
-				{boardInterface.getCurrentPlayer.fold(0)(cp => boardInterface.players.indexOf(cp))}
+				{boardInterface.currentPlayer}
 			</current-player>
 			<players>
 				{boardInterface.players.map(p => p.toXml)}
@@ -44,6 +44,11 @@ private object FileIoXml {
 			<current-pos>
 				{boardInterface.currentPos.map(p => p.toXml).getOrElse("")}
 			</current-pos>
+			<islands>
+				{boardInterface.islands.map(i => {
+				i.toXml
+			})}
+			</islands>
 		</board>
 	}
 
@@ -113,6 +118,33 @@ private object FileIoXml {
 		</position>
 	}
 
+	implicit class SubPositionXML(subPosition: SubPosition) {
+		def toXml: Elem = <sub-position>
+			{subPosition.position.toXml}{subPosition.direction.toXml}
+		</sub-position>
+	}
+
+	implicit class IslandXML(island: Island) {
+		def toXml: Elem = <island>
+			<content>
+				{island.content.map(p => p.toXml)}
+			</content>
+			<complete>
+				{island.complete}
+			</complete>
+			<value>
+				{island.value}
+			</value>
+			<owners>
+				{island.owners.map(o => {
+				<owner>
+					{o}
+				</owner>
+			})}
+			</owners>
+		</island>
+	}
+
 	implicit class ElemXML(elem: Node) {
 		private val injector: Injector = Guice.createInjector(GameModule())
 		private val playerFactory: PlayerFactory = injector.getInstance(classOf[PlayerFactory])
@@ -127,8 +159,9 @@ private object FileIoXml {
 			val currentTile = if (currentTileNode.text.trim == "") Option.empty else Option((currentTileNode \ "tile").head.toTile.get)
 			val currentPosNode = (elem \ "current-pos").head
 			val currentPos = if (currentPosNode.text.trim == "") Option.empty else Option((currentPosNode \ "position").head.toPosition.get)
+			val islands = (elem \ "islands" \ "island").map(n => n.toIsland.get).toVector
 
-			injector.getInstance(classOf[BoardInterface]).create(players, currentPlayer, tiles, currentTile, currentPos)
+			injector.getInstance(classOf[BoardInterface]).create(players, currentPlayer, tiles, currentTile, currentPos, islands)
 		}
 
 		def toPlayer: Try[PlayerInterface] = Try {
@@ -159,6 +192,21 @@ private object FileIoXml {
 			val y = (elem \ "y").head.text.trim.toInt
 
 			Position(x, y)
+		}
+
+		def toSubPosition: Try[SubPosition] = Try {
+			val position = (elem \ "position").head.toPosition.get
+			val direction = stringToDirection((elem \ "direction").head.text.trim).get
+			SubPosition(position, direction)
+		}
+
+		def toIsland: Try[Island] = Try {
+			val content = HashSet.from((elem \ "content" \ "sub-position").map(n => n.toSubPosition.get))
+			val complete = (elem \ "complete").head.text.trim.toBoolean
+			val value = (elem \ "value").head.text.trim.toInt
+			val owners = HashSet.from((elem \ "owners").map(n => n.text.trim))
+
+			Island(content, complete, value, owners)
 		}
 
 		private def stringToTerrain(str: String): Try[Terrain] = Try(Terrain.defaults.find(t => t.getClass.getSimpleName == str).get)
