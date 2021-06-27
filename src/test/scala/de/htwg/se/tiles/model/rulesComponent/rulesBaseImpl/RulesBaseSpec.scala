@@ -66,7 +66,7 @@ class RulesBaseSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
 			val pos = Position(0, 0)
 			val board = Board(
 				players = Vector[PlayerBase]()
-					.appended(PlayerBase("p1", Color.color(0, 1, 0)))
+					.appended(PlayerBase("p1", Color.color(0, 1, 0), people = Vector((pos, Direction.Center))))
 					.appended(PlayerBase("p2", Color.color(1, 0, 0)))
 				,
 				tiles = new HashMap[Position, Tile]()
@@ -74,14 +74,12 @@ class RulesBaseSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
 					.updated(pos.north(), Tile(Terrain.Water, Terrain.Water, Terrain.Plains, Terrain.Water, Terrain.Water))
 					.updated(pos.south(), Tile(Terrain.Mountains, Terrain.Water, Terrain.Mountains, Terrain.Water, Terrain.Mountains))
 			)
-
 			val rules = RulesBase()
-
 			rules.findIsland(board, SubPosition(pos, Direction.North)) shouldBe new Island(
 				HashSet(SubPosition(pos, Direction.North),
 					SubPosition(pos, Direction.Center),
 					SubPosition(pos.north(), Direction.South)
-				), complete = true, valueOf(1, 2, rules), HashSet.empty)
+				), complete = true, valueOf(1, 2, rules), HashSet("p1"))
 
 			rules.findIsland(board, SubPosition(pos, Direction.North)) shouldBe rules.findIsland(board, SubPosition(pos.north(), Direction.South))
 
@@ -91,6 +89,27 @@ class RulesBaseSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
 					SubPosition(pos.south(), Direction.North),
 					SubPosition(pos.south(), Direction.South)
 				), complete = false, valueOf(1, 3, rules), HashSet.empty)
+		}
+		"assignPoints" in {
+			val pos = Position(0, 0)
+			val board = Board(
+				players = Vector[PlayerBase]()
+					.appended(PlayerBase("p1", Color.color(0, 1, 0), people = Vector((pos, Direction.Center), (pos, Direction.North))))
+					.appended(PlayerBase("p2", Color.color(1, 0, 0))),
+				tiles = new HashMap[Position, Tile]()
+					.updated(pos, Tile(Terrain.Plains, Terrain.Water, Terrain.Mountains, Terrain.Water, Terrain.Plains))
+					.updated(pos.north(), Tile(Terrain.Water, Terrain.Water, Terrain.Plains, Terrain.Water, Terrain.Water))
+					.updated(pos.south(), Tile(Terrain.Mountains, Terrain.Water, Terrain.Mountains, Terrain.Water, Terrain.Mountains)),
+				islands = Vector(Island(HashSet(SubPosition(Position(-1, -1), Direction.Center)), complete = true, 1, HashSet.empty))
+			)
+
+			val result = RulesBase().assignPoints(board)
+			val playersWithPoints = result.players
+
+			playersWithPoints(0).points shouldBe valueOf(1, 2, rules)
+			playersWithPoints(1).points shouldBe 0
+
+			result.islands.size shouldBe 2
 		}
 	}
 

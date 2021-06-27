@@ -39,7 +39,7 @@ case class RulesBase(maxPeople: Int = 5, valueCenter: Double = 1.2, valueBorder:
 
 	override def randomPlaceable(b: BoardInterface): TileInterface = if (b.tiles.isEmpty) b.getTileBuilder.randomTile() else b.getTileBuilder.rotateRandom(makeFit(b.getTileBuilder.randomTile(), b, possiblePositions(b).toVector(0))).get
 
-	override def evaluatePoints(b: BoardInterface): BoardInterface = {
+	override def assignPoints(b: BoardInterface): BoardInterface = {
 		val completeIslands = b.islands.filter(i => i.complete)
 		val people = b.players.flatMap(p => p.people.map(pp => (p, pp)))
 		var islandsWithPeople = Vector.empty[Island]
@@ -74,9 +74,7 @@ case class RulesBase(maxPeople: Int = 5, valueCenter: Double = 1.2, valueBorder:
 					b.tiles.get(n.position).map(t => t.getTerrainAt(n.direction)).exists(b.tiles.get(p.position).map(t => t.getTerrainAt(p.direction)).contains)
 				)
 
-				if (complete) {
-					complete = differentTile.subsetOf(next)
-				}
+				complete = complete && differentTile.subsetOf(next)
 
 				queue = queue.appendedAll(next)
 				content = content.union(next)

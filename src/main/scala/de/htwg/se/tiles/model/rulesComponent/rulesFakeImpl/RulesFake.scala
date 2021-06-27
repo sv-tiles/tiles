@@ -15,7 +15,7 @@ case class RulesFake(maxPeople: Int = 5) extends RulesInterface {
 
 	override def randomPlaceable(b: BoardInterface): TileInterface = b.getTileBuilder.randomTile()
 
-	override def evaluatePoints(b: BoardInterface): BoardInterface = {
+	override def assignPoints(b: BoardInterface): BoardInterface = {
 		val players = b.players
 			.map(p => p.setPeople(p.people.filterNot(pp => b.islands.exists(i => i.content.contains(SubPosition.tupled(pp))))))
 			.map(p => p.setPoints(b.islands.filter(i => i.owners.contains(p.name)).map(i => i.value / i.owners.size).sum))

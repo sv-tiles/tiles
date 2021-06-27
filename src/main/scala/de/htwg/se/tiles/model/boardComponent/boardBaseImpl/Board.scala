@@ -63,7 +63,7 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 		if (players.isEmpty) {
 			return Failure(PlacementException("No players"))
 		}
-		rules.evaluatePoints(create(
+		rules.assignPoints(create(
 			currentPos = Option.empty,
 			currentTile = Option(rules.randomPlaceable(this)),
 			players = people.fold(players)(d => players.updated(currentPlayer, getCurrentPlayer.get.setPeople(getCurrentPlayer.get.people.appended((currentPos.get, d))))),

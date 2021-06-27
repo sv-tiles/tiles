@@ -18,7 +18,7 @@ trait RulesInterface {
 
 	def randomPlaceable(b: BoardInterface): TileInterface
 
-	def evaluatePoints(b: BoardInterface): BoardInterface
+	def assignPoints(b: BoardInterface): BoardInterface
 
 	def findIsland(b: BoardInterface, start: SubPosition): Island
 }
