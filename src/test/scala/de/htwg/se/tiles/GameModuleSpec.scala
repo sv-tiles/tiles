@@ -22,7 +22,8 @@ class GameModuleSpec extends AnyWordSpec with Matchers {
 			injector.getInstance(classOf[RulesInterface]) shouldBe RulesBase()
 		}
 		"inject board" in {
-			injector.getInstance(classOf[BoardInterface]) shouldBe Board()
+			val injected = injector.getInstance(classOf[BoardInterface])
+			injected shouldBe Board().copy(currentTile = injected.currentTile)
 		}
 		"create players" in {
 			injector.getInstance(classOf[PlayerFactory]).create("test", color) shouldBe PlayerBase("test", color)
@@ -36,7 +37,7 @@ class GameModuleSpec extends AnyWordSpec with Matchers {
 			val injected = injector.getInstance(classOf[ControllerInterface])
 			val handmade = new Controller(board, rules, playerFactory, fileIo)
 
-			injected.board shouldBe handmade.board
+			injected.board shouldBe handmade.board.create(currentTile = injected.board.currentTile)
 
 			injected.addPlayer("test", color)
 			handmade.addPlayer("test", color)

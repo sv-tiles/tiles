@@ -12,6 +12,8 @@ trait BoardInterface {
 
 	def currentPos: Option[Position]
 
+	def currentPlayer: Int
+
 	def tiles: HashMap[Position, TileInterface]
 
 	def getTileBuilder: TileBuilderInterface
@@ -38,5 +40,5 @@ trait BoardInterface {
 
 	def updatePlayers(players: Vector[PlayerInterface]): BoardInterface
 
-	def create(players: Vector[PlayerInterface], currentPlayer: Int, tiles: HashMap[Position, TileInterface], currentTile: Option[TileInterface], currentPos: Option[Position]): BoardInterface
+	def create(players: Vector[PlayerInterface] = players, currentPlayer: Int = currentPlayer, tiles: HashMap[Position, TileInterface] = tiles, currentTile: Option[TileInterface] = currentTile, currentPos: Option[Position] = currentPos): BoardInterface
 }
