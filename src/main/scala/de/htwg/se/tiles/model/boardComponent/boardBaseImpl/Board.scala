@@ -53,7 +53,7 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 		create(tiles = tiles.updated(pos, Tile(tile.north, tile.east, tile.south, tile.west, tile.center)))
 	}
 
-	override def commit(rules: RulesInterface, people: Option[Direction] = Option.empty): Try[BoardInterface] = rules.canPlace(this).flatMap(canPlace => Try {
+	override def commit(rules: RulesInterface, people: Option[Direction] = Option.empty): Try[BoardInterface] = rules.canPlace(this, people).flatMap(canPlace => Try {
 		if (!canPlace) {
 			return Failure(PlacementException("Placement not valid"))
 		}

@@ -1,6 +1,7 @@
 package de.htwg.se.tiles.control.controllerComponent
 
 import de.htwg.se.tiles.model.boardComponent.BoardInterface
+import de.htwg.se.tiles.model.playerComponent.PlayerInterface
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 import de.htwg.se.tiles.model.{Direction, GameSnapshot, Position}
 import de.htwg.se.tiles.util.Observable
@@ -9,6 +10,8 @@ import scalafx.scene.paint.Color
 import scala.util.Try
 
 trait ControllerInterface extends Observable[(Boolean, String)] {
+	def setPlayerColor(p: PlayerInterface, value: Color): Unit
+
 	def board: BoardInterface
 
 	def rules: RulesInterface

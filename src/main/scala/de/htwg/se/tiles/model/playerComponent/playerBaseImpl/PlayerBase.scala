@@ -13,4 +13,6 @@ case class PlayerBase(name: String, color: Color, people: Vector[(Position, Dire
 	override def setPeople(people: Vector[(Position, Direction)]): PlayerInterface = copy(people = people)
 
 	override def setPoints(points: Int): PlayerInterface = copy(points = points)
+
+	override def setColor(color: Color): PlayerInterface = copy(color = color)
 }

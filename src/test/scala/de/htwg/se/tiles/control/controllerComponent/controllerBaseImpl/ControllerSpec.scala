@@ -222,6 +222,39 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			lastError2._1 shouldBe false
 			lastError2._2 should (startWith("Error:"))
 		}
+		"fail on add player if player name already in use" in {
+			val fIo = new FileIoError()
+			val controller = new Controller(Board(), RulesFake(), playerFactory = playerGenerator, fileIo = fIo)
+			val observer = new RecordingObserver()
+
+			controller.add(observer)
+
+			controller.addPlayer("test")
+
+			controller.board.players.size shouldBe 1
+
+			observer.list.last shouldBe(true, "")
+
+			controller.addPlayer("test")
+
+			controller.board.players.size shouldBe 1
+
+			observer.list.last shouldBe(false, "Player name already exists")
+		}
+		"set player color" in {
+			val fIo = new FileIoError()
+			val controller = new Controller(Board(), RulesFake(), playerFactory = playerGenerator, fileIo = fIo)
+
+			controller.addPlayer("test")
+
+			controller.addPlayer("test2")
+
+			controller.board.players.size shouldBe 2
+
+			controller.setPlayerColor(controller.board.players.last, Color.Lime)
+
+			controller.board.players.last.color shouldBe Color.Lime
+		}
 	}
 
 	class TestErrorUndoCommand extends Command {

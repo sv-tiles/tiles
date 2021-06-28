@@ -52,7 +52,12 @@
     -fx-font-family: "Segoe UI Semibold";
 }
 
-.button {
+.custom-color-dialog, .color-picker {
+    -fx-control-inner-background: rgb(100,100,100);
+    -fx-background: rgb(100,100,100);
+}
+
+.button, .color-picker {
     -fx-padding: 5 22 5 22;
     -fx-border-color: #e2e2e2;
     -fx-border-width: 2;
@@ -64,16 +69,16 @@
     -fx-background-insets: 0 0 0 0, 0, 1, 2;
 }
 
-.button:hover {
+.button:hover, .color-picker:hover {
     -fx-background-color: #3a3a3a;
 }
 
-.button:pressed, .button:default:hover:pressed {
+.button:pressed, .button:default:hover:pressed, .color-picker:pressed, .color-picker:default:hover:pressed {
   -fx-background-color: white;
   -fx-text-fill: #1d1d1d;
 }
 
-.button:focused {
+.button:focused, .color-picker:focused {
     -fx-border-color: white, white;
     -fx-border-width: 1, 1;
     -fx-border-style: solid, segments(1, 1);
@@ -81,17 +86,17 @@
     -fx-border-insets: 1 1 1 1, 0;
 }
 
-.button:disabled, .button:default:disabled {
+.button:disabled, .button:default:disabled, .color-picker:disabled, .color-picker:default:disabled {
     -fx-opacity: 0.4;
     -fx-background-color: #1d1d1d;
     -fx-text-fill: white;
 }
 
-.button:default {
+.button:default, .color-picker:default {
     -fx-background-color: -fx-focus-color;
     -fx-text-fill: #ffffff;
 }
 
-.button:default:hover {
+.button:default:hover, .color-picker:default:hover {
     -fx-background-color: derive(-fx-focus-color,30%);
 }

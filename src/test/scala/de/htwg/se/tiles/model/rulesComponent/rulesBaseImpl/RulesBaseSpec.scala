@@ -52,8 +52,8 @@ class RulesBaseSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
 			rules.canPlace(tile.copy(south = Terrain.Mountains), board.tiles, pos) shouldBe false
 			rules.canPlace(tile.copy(west = Terrain.Mountains), board.tiles, pos) shouldBe false
 
-			rules.canPlace(board).isFailure shouldBe true
-			rules.canPlace(board.create(currentTile = Option(tile)).placeCurrentTile(pos).get).get shouldBe true
+			rules.canPlace(board, Option.empty).isFailure shouldBe true
+			rules.canPlace(board.create(currentTile = Option(tile)).placeCurrentTile(pos).get, Option.empty).get shouldBe true
 		}
 		"return random placeable tiles" in {
 			noException should be thrownBy rules.randomPlaceable(Board())

@@ -8,6 +8,8 @@ trait PlayerInterface {
 
 	def color: Color
 
+	def setColor(color: Color): PlayerInterface
+
 	def people: Vector[(Position, Direction)]
 
 	def setPeople(people: Vector[(Position, Direction)]): PlayerInterface

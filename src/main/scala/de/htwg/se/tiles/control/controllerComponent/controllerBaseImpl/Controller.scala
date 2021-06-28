@@ -5,7 +5,7 @@ import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
 import de.htwg.se.tiles.model._
 import de.htwg.se.tiles.model.boardComponent.BoardInterface
 import de.htwg.se.tiles.model.fileIoComponent.FileIoInterface
-import de.htwg.se.tiles.model.playerComponent.PlayerFactory
+import de.htwg.se.tiles.model.playerComponent.{PlayerFactory, PlayerInterface}
 import de.htwg.se.tiles.model.rulesComponent.RulesInterface
 import de.htwg.se.tiles.util.UndoManager
 import scalafx.scene.paint.Color
@@ -15,8 +15,12 @@ import scala.util.{Success, Try}
 
 class Controller @Inject()(var board: BoardInterface, var rules: RulesInterface, var playerFactory: PlayerFactory, var fileIo: FileIoInterface, var undoManager: UndoManager = new UndoManager()) extends ControllerInterface {
 	override def addPlayer(name: String, color: Color = Color.Black): Unit = {
-		board = board.updatePlayers(board.players.appended(playerFactory.create(name, color)))
-		notifyObservers((true, ""))
+		if (board.players.exists(p => p.name == name)) {
+			notifyObservers((false, "Player name already exists"))
+		} else {
+			board = board.updatePlayers(board.players.appended(playerFactory.create(name, color)))
+			notifyObservers((true, ""))
+		}
 	}
 
 	override def load(file: String): Unit = notifyObservers(Try({
@@ -74,4 +78,8 @@ class Controller @Inject()(var board: BoardInterface, var rules: RulesInterface,
 
 	override def redo(): Unit =
 		undoManager.redo().fold(e => notifyObservers((false, e.getMessage)), _ => notifyObservers((true, "")))
+
+	override def setPlayerColor(player: PlayerInterface, value: Color): Unit = {
+		board = board.create(players = board.players.map(p => if (p == player) p.setColor(value) else p))
+	}
 }
