@@ -52,7 +52,7 @@ case class RulesBase(maxPeople: Int = 5, valueCenter: Double = 1.2, valueBorder:
 
 		val islands = completeIslands.appendedAll(islandsWithPeople)
 		val players = b.players
-			.map(p => p.setPeople(p.people.filterNot(pp => islands.exists(i => i.content.contains(SubPosition.tupled(pp))))))
+			.map(p => p.setPeople(p.people.filterNot(pp => islands.exists(i => i.complete && i.content.contains(SubPosition.tupled(pp))))))
 			.map(p => p.setPoints(islands.filter(i => i.complete && i.owners.contains(p.name)).map(i => i.value / i.owners.size).sum))
 
 		b.create(islands = islands, players = players)

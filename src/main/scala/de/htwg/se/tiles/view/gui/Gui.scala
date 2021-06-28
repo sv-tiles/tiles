@@ -2,16 +2,15 @@ package de.htwg.se.tiles.view.gui
 
 import de.htwg.se.tiles.control.controllerComponent.ControllerInterface
 import de.htwg.se.tiles.model.boardComponent.{Terrain, TileInterface}
-import de.htwg.se.tiles.model.{Direction, Position}
+import de.htwg.se.tiles.model.{Direction, Position, SubPosition}
 import de.htwg.se.tiles.util.{Observer, Position2D}
 import scalafx.application.{JFXApp3, Platform}
 import scalafx.scene.control._
-import scalafx.scene.input.MouseButton
 import scalafx.scene.layout._
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Polygon, Polyline, Rectangle, Shape}
 import scalafx.scene.text.Text
-import scalafx.scene.{Group, Scene}
+import scalafx.scene.{Group, Node, Scene}
 import scalafx.stage.FileChooser
 
 
@@ -19,8 +18,25 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 	private var size = 50d
 	private var offset = Position2D(0d, 0d)
 
+	private var placePeople: Option[SubPosition] = Option.empty
+	private var highlight: Option[SubPosition] = Option.empty
+	private var highlightGroup: Group = new Group() {
+		mouseTransparent = true
+	}
+
+	private var anchor = Position2D(0, 0)
+	private var lastClick: Long = 0
+
 	private val pane: Pane = new Pane {
 		style = "-fx-background-color: rgb(50,50,50)"
+		val rect: Rectangle = Rectangle(0, 0)
+		rect.widthProperty().bind(this.widthProperty())
+		rect.heightProperty().bind(this.heightProperty())
+		this.setClip(rect)
+	}
+
+	private val players = new VBox() {
+		prefWidth = 200
 	}
 
 	private val info = new Text("") {
@@ -35,8 +51,8 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 	override def start(): Unit = {
 		stage = new JFXApp3.PrimaryStage {
 			title.value = "Tiles"
-			width = 800
-			height = 500
+			width = 1000
+			height = 800
 			scene = new Scene {
 				stylesheets.add(getClass.getResource("style.css").toString)
 				root = new BorderPane {
@@ -48,16 +64,6 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 								items = List(
 									new MenuItem("Clear") {
 										onAction = e => controller.clear()
-									},
-									new MenuItem("Add player") {
-										onAction = _ => new TextInputDialog() {
-											initOwner(stage)
-											title = "Add player"
-											contentText = "name:"
-										}.showAndWait().foreach(name => {
-											controller.addPlayer(name)
-											update()
-										})
 									},
 									new MenuItem("Save") {
 										onAction = _ => {
@@ -92,12 +98,13 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 							}
 						)
 					}
+					right = players
 				}
 				private var anchor = Position2D(0d, 0d)
-				onMousePressed = event => if (event.getButton == MouseButton.Secondary.delegate) {
+				onMousePressed = event => if (event.isSecondaryButtonDown) {
 					anchor = Position2D(event.getSceneX, event.getSceneY)
 				}
-				onMouseDragged = event => if (event.getButton == MouseButton.Secondary.delegate) {
+				onMouseDragged = event => if (event.isSecondaryButtonDown) {
 					offset += anchor - (event.getSceneX, event.getSceneY)
 					anchor = Position2D(event.getSceneX, event.getSceneY)
 					update()
@@ -123,6 +130,29 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 		(((pos.x + offset.x + size / 2d - pane.width.value / 2d) / size).round.intValue, ((pos.y + offset.y + size / 2d - pane.height.value / 2d) / size).round.intValue)
 
 	override def update(value: (Boolean, String) = (true, "")): Unit = {
+		players.children = controller.board.players.map[Node](p => new VBox() {
+			fillWidth = true
+			if (controller.board.getCurrentPlayer.get == p) {
+				border = new Border(new BorderStroke(Color.Red, BorderStrokeStyle.Solid, CornerRadii.Empty, BorderWidths.Default))
+			}
+			children = List(
+				new Label(p.name),
+				new Label(p.points + " Points"),
+				new Label((controller.rules.maxPeople - p.people.size) + " People available")
+			)
+		}).toList.appended(
+			new Button("Add Player") {
+				maxWidth(Double.MaxValue)
+				onAction = _ => new TextInputDialog() {
+					initOwner(stage)
+					title = "Add player"
+					contentText = "name:"
+				}.showAndWait().foreach(name => {
+					controller.addPlayer(name)
+					update()
+				})
+			}
+		)
 		if (controller.board.players.isEmpty) {
 			info.text = "No players!"
 			return
@@ -144,15 +174,35 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				this.setUserData(t)
 				children = generatePolygons(tile, screenPos, size)
 				if (controller.board.currentPos.contains(pos)) {
+
 					children.foreach(n => {
 						n.setOnMouseEntered(e => {
-							n.setOpacity(0.5)
-							println(n.getUserData)
+							highlight = Option(SubPosition(pos, n.getUserData.asInstanceOf[Direction]))
+							updateHighlight()
 						})
 						n.setOnMouseExited(e => {
-							n.setOpacity(1.0)
+							highlight = Option.empty
+							updateHighlight()
 						})
-						n.setOnMouseClicked(e => println("click"))
+						n.setOnMousePressed(e => {
+							if (e.isSecondaryButtonDown) {
+								println(System.currentTimeMillis() - lastClick)
+								if (System.currentTimeMillis() - lastClick < 300) {
+									lastClick = 0
+									val dir = n.getUserData.asInstanceOf[Direction]
+									if (placePeople.exists(sp => sp.position == pos && sp.direction == dir)) {
+										placePeople = Option.empty
+									} else {
+										placePeople = Option(SubPosition(pos, dir))
+									}
+									update()
+								} else {
+									lastClick = System.currentTimeMillis()
+								}
+							} else if (e.isPrimaryButtonDown) {
+								e.setDragDetect(true)
+							}
+						})
 					})
 
 					children.add(new Polyline {
@@ -170,19 +220,18 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 						)
 						stroke = Color.color(1, 0, 0)
 					})
-					var anchor = Position2D(0, 0)
 					onMousePressed = e => if (e.isPrimaryButtonDown) {
 						anchor = Position2D(e.getSceneX - translateX.value, e.getSceneY - translateY.value)
-						println(anchor)
 					} else if (e.isForwardButtonDown) {
 						controller.rotate(false)
 					} else if (e.isBackButtonDown) {
 						controller.rotate(true)
 					} else if (e.isMiddleButtonDown) {
-						// TODO place people
-						controller.commit(Option.empty)
+						controller.commit(placePeople.map(p => p.direction))
+						placePeople = Option.empty
 					}
 					onMouseDragged = e => if (e.isPrimaryButtonDown) {
+						println("drag")
 						translateX.value = e.getSceneX - anchor.x
 						translateY.value = e.getSceneY - anchor.y
 					}
@@ -205,9 +254,30 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				pane.children.remove(e)
 				pane.children.add(e)
 			})
+
+			controller.board.players.foreach(p =>
+				p.people.foreach(sp => {
+					pane.children.add(new Polyline {
+						generatePoints(boardToLocal(sp._1), size, sp._2).foreach(v => points.add(v))
+						stroke = p.color
+					})
+				})
+			)
+
+			placePeople.foreach(sp => {
+				pane.children.add(new Polyline {
+					generatePoints(boardToLocal(sp.position), size, sp.direction).foreach(v => points.add(v))
+					stroke = controller.board.getCurrentPlayer.get.color
+				})
+
+			})
+
+			pane.children.add(highlightGroup)
+			updateHighlight()
+
 			if (controller.board.currentTile.isEmpty) {
 				pane.children.add(new Button {
-					translateX.value = pane.width.value - 50
+					translateX.bind(pane.width - width)
 					maxWidth(size)
 					minWidth(size)
 					maxHeight(size)
@@ -242,6 +312,25 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 		})
 	}
 
+	def updateHighlight(): Unit = {
+		highlightGroup.children.clear()
+		highlight.foreach(sp => {
+			val island = controller.rules.findIsland(controller.board, sp)
+
+
+			val shape = island.content.map(p => new Polygon {
+				generatePoints(boardToLocal(p.position), size, p.direction).foreach(v => points.add(v))
+			}).map(p => p.asInstanceOf[Shape]).reduce((p1, p2) => Shape.union(p1, p2))
+			shape.fill = Color.Transparent
+			shape.stroke = Color.Red
+			shape.strokeWidth = Math.max(1, size / 50d)
+			if (!island.complete) {
+				shape.getStrokeDashArray.addAll(size / 25d, size / 25d)
+			}
+			highlightGroup.children.add(shape)
+		})
+	}
+
 	def colorOf(terrain: Terrain): Color = terrain match {
 		case Terrain.Hills => Color.color(80 / 255d, 65 / 255d, 0)
 		case Terrain.Water => Color.color(0, 180 / 255d, 230 / 255d)
@@ -253,7 +342,35 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 
 	def generatePolygons(tile: TileInterface, pos: Position2D, size: Double): List[Shape] = List(
 		new Polygon {
-			points.addAll(
+			generatePoints(pos, size, Direction.North).foreach(v => points.add(v))
+			fill = colorOf(tile.north)
+			userData = Direction.North
+		},
+		new Polygon {
+			generatePoints(pos, size, Direction.East).foreach(v => points.add(v))
+			fill = colorOf(tile.east)
+			userData = Direction.East
+		},
+		new Polygon {
+			generatePoints(pos, size, Direction.South).foreach(v => points.add(v))
+			fill = colorOf(tile.south)
+			userData = Direction.South
+		},
+		new Polygon {
+			generatePoints(pos, size, Direction.West).foreach(v => points.add(v))
+			fill = colorOf(tile.west)
+			userData = Direction.West
+		},
+		new Polygon {
+			generatePoints(pos, size, Direction.Center).foreach(v => points.add(v))
+			fill = colorOf(tile.center)
+			userData = Direction.Center
+		}
+	)
+
+	def generatePoints(pos: Position2D, size: Double, direction: Direction): Vector[Double] =
+		direction match {
+			case Direction.North => Vector(
 				pos.x,
 				pos.y,
 				pos.x + size * .2,
@@ -261,13 +378,11 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				pos.x + size * .8,
 				pos.y + size * .2,
 				pos.x + size,
+				pos.y,
+				pos.x,
 				pos.y
 			)
-			fill = colorOf(tile.north)
-			userData = Direction.North
-		},
-		new Polygon {
-			points.addAll(
+			case Direction.East => Vector(
 				pos.x + size,
 				pos.y,
 				pos.x + size * .8,
@@ -275,13 +390,11 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				pos.x + size * .8,
 				pos.y + size * .8,
 				pos.x + size,
-				pos.y + size
+				pos.y + size,
+				pos.x + size,
+				pos.y
 			)
-			fill = colorOf(tile.east)
-			userData = Direction.East
-		},
-		new Polygon {
-			points.addAll(
+			case Direction.South => Vector(
 				pos.x,
 				pos.y + size,
 				pos.x + size * .2,
@@ -289,13 +402,11 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				pos.x + size * .8,
 				pos.y + size * .8,
 				pos.x + size,
+				pos.y + size,
+				pos.x,
 				pos.y + size
 			)
-			fill = colorOf(tile.south)
-			userData = Direction.South
-		},
-		new Polygon {
-			points.addAll(
+			case Direction.West => Vector(
 				pos.x,
 				pos.y,
 				pos.x + size * .2,
@@ -303,18 +414,22 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				pos.x + size * .2,
 				pos.y + size * .8,
 				pos.x,
-				pos.y + size
+				pos.y + size,
+				pos.x,
+				pos.y
 			)
-			fill = colorOf(tile.west)
-			userData = Direction.West
-		},
-		new Rectangle {
-			x = pos.x +.2 * size
-			y = pos.y +.2 * size
-			width = size * .6
-			height = size * .6
-			fill = colorOf(tile.center)
-			userData = Direction.Center
+			case Direction.Center => Vector(
+				pos.x +.2 * size,
+				pos.y +.2 * size,
+				pos.x +.2 * size + size * .6,
+				pos.y +.2 * size,
+				pos.x +.2 * size + size * .6,
+				pos.y +.2 * size + size * .6,
+				pos.x +.2 * size,
+				pos.y +.2 * size + size * .6,
+				pos.x +.2 * size,
+				pos.y +.2 * size
+			)
 		}
-	)
+
 }
