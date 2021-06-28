@@ -5,6 +5,7 @@ import de.htwg.se.tiles.model.boardComponent.{Terrain, TileInterface}
 import de.htwg.se.tiles.model.{Direction, Position, SubPosition}
 import de.htwg.se.tiles.util.{Observer, Position2D}
 import scalafx.application.{JFXApp3, Platform}
+import scalafx.geometry.Insets
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
 import scalafx.scene.layout._
@@ -20,6 +21,10 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 	private var offset = Position2D(0d, 0d)
 
 	private var placePeople: Option[SubPosition] = Option.empty
+	private var placePeopleNode: Node = new Circle() {
+		visible = false
+	}
+
 	private var highlight: Option[SubPosition] = Option.empty
 	private var highlightGroup: Group = new Group() {
 		mouseTransparent = true
@@ -115,11 +120,34 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 					bottom = info
 					left = new VBox {
 						children = List(
-							new Button("undo") {
+							new Button("Undo") {
+								maxWidth = Double.MaxValue
 								onAction = e => controller.undo()
 							},
-							new Button("redo") {
+							new Button("Redo") {
+								maxWidth = Double.MaxValue
 								onAction = e => controller.redo()
+							},
+							new Label("Rotate") {
+								margin = Insets.apply(10, 0, 0, 0)
+							},
+							new Button("Left") {
+								maxWidth = Double.MaxValue
+								onAction = _ => controller.rotate(false)
+							},
+							new Button("Right") {
+								maxWidth = Double.MaxValue
+								onAction = _ => controller.rotate(true)
+							},
+							new Label("") {
+								margin = Insets.apply(10, 0, 0, 0)
+							},
+							new Button("End turn") {
+								maxWidth = Double.MaxValue
+								onAction = _ => {
+									controller.commit(placePeople.map(p => p.direction))
+									placePeople = Option.empty
+								}
 							}
 						)
 					}
@@ -164,6 +192,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 			children = List(
 				new Label(p.name),
 				new ColorPicker(p.color) {
+					style = "-fx-color-label-visible: false ;"
 					onAction = _ => {
 						println(value.value)
 						controller.setPlayerColor(p, new Color(value.value))
@@ -175,13 +204,13 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 			)
 		}).toList.appended(
 			new Button("Add Player") {
-				maxWidth(Double.MaxValue)
+				maxWidth = Double.MaxValue
 				onAction = _ => new TextInputDialog() {
 					initOwner(stage)
 					title = "Add player"
 					contentText = "name:"
 				}.showAndWait().foreach(name => {
-					controller.addPlayer(name)
+					controller.addPlayer(name, randomColor())
 					update()
 				})
 			}
@@ -265,6 +294,9 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 						translateX.value = e.getSceneX - anchor.x
 						translateY.value = e.getSceneY - anchor.y
 
+						placePeopleNode.translateX = translateX.value
+						placePeopleNode.translateY = translateY.value
+
 						pane.children.remove(highlightGroup)
 					}
 					onMouseReleased = e => if (!e.isPrimaryButtonDown) {
@@ -276,6 +308,9 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 								controller.placeTile(p.x, p.y)
 							}
 						})
+						if (controller.board.currentPos.isDefined) {
+							placePeople = placePeople.map(p => SubPosition(controller.board.currentPos.get, p.direction))
+						}
 
 						update()
 					}
@@ -294,7 +329,8 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 			)
 
 			placePeople.foreach(sp => {
-				pane.children.add(generateCircle(boardToLocal(sp.position), size, sp.direction, controller.board.getCurrentPlayer.get.color, ignoreMouse = true))
+				placePeopleNode = generateCircle(boardToLocal(sp.position), size, sp.direction, controller.board.getCurrentPlayer.get.color, ignoreMouse = true)
+				pane.children.add(placePeopleNode)
 			})
 
 			pane.children.add(highlightGroup)
@@ -499,4 +535,6 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 			mouseTransparent = ignoreMouse
 		}
 	}
+
+	def randomColor(): Color = Color.Red.deriveColor(Math.random() * 360, 1, 1, 1)
 }
