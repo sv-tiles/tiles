@@ -117,7 +117,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 				board3.placeCurrentTile(Position(10, 10)).get shouldBe board3.create(tiles = board3.tiles.updated(Position(10, 10), tile2), currentPos = Option(Position(10, 10)), currentTile = Option.empty)
 			}
 		}
-		"pickup current tile" should {
+		"pick up current tile" should {
 			val tile = boardBaseImpl.Tile(Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains, Terrain.Plains)
 			val board1 = Board(tiles = new HashMap().updated(Position(0, 0), tile), currentTile = Option.empty, currentPos = Option(Position(0, 0)))
 			val board2 = Board(tiles = new HashMap(), currentTile = Option(tile), currentPos = Option.empty)
@@ -185,7 +185,7 @@ class BoardSpec extends AnyWordSpec with Matchers {
 		}
 	}
 	"A board" should {
-		"have equivalent no-args apply and constructor methods" in {
+		"have equivalent non-args apply and constructor methods" in {
 			val b1 = Board.apply()
 			val b2 = new Board()
 			b1.create(currentTile = b2.currentTile) shouldBe b2

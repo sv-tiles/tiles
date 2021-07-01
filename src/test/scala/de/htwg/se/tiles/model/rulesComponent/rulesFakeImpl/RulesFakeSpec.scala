@@ -12,7 +12,7 @@ import scala.collection.immutable.{HashMap, HashSet}
 
 class RulesFakeSpec extends AnyWordSpec with Matchers {
 	"A RulesFake" should {
-		"have equivalent no-prams constructors" in {
+		"have equivalent non-prams constructors" in {
 			RulesFake.apply().maxPeople shouldBe new RulesFake().maxPeople
 		}
 		"find islands" in {

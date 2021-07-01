@@ -14,7 +14,7 @@ class TerrainSpec extends AnyWordSpec with Matchers {
 		"consist of only one letter" in {
 			Terrain.defaults.filter(t => t.symbol.length != 1) shouldBe empty
 		}
-		"should be used by toString" in {
+		"be used by toString" in {
 			Terrain.Mountains.toString shouldBe Terrain.Mountains.symbol
 		}
 	}

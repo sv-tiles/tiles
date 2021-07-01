@@ -22,7 +22,7 @@ class PositionSpec extends AnyWordSpec with Matchers {
 
 			pos.neighbours() shouldBe Set(pos.north(), pos.east(), pos.south(), pos.west())
 		}
-		"fail if find not neighbour" in {
+		"fail if no neighbors can be found because none exist" in {
 			val pos = Position(0, 0)
 			pos.directionOfNeighbour(Position(10, 10)).isFailure shouldBe true
 		}

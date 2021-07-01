@@ -12,7 +12,7 @@ class TileSpec extends AnyWordSpec with Matchers {
 			"unapply" in {
 				Tile.unapply(tile).get shouldBe(Terrain.Water, Terrain.Mountains, Terrain.Forest, Terrain.Hills, Terrain.Plains)
 			}
-			"work" in {
+			"have correct regions" in {
 				Tile.unapply(Tile(Terrain.Water)).get shouldBe(Terrain.Water, Terrain.Water, Terrain.Water, Terrain.Water, Terrain.Water)
 				Tile.unapply(Tile(Terrain.Plains, Terrain.Water)).get shouldBe(Terrain.Water, Terrain.Water, Terrain.Water, Terrain.Water, Terrain.Plains)
 			}

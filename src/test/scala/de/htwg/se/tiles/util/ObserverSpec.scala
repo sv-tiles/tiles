@@ -15,7 +15,7 @@ class ObserverSpec extends AnyWordSpec with Matchers {
 			class TestObservable extends Observable[Int] {
 
 			}
-			"work" in {
+			"observe" in {
 				val observer = new TestObserver()
 				val observable = new TestObservable()
 
@@ -43,7 +43,7 @@ class ObserverSpec extends AnyWordSpec with Matchers {
 			class TestObservable extends Observable[Unit] {
 
 			}
-			"work" in {
+			"observe" in {
 				val observer = new TestObserver()
 				val observable = new TestObservable()
 

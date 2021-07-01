@@ -164,7 +164,7 @@ class TuiSpec extends AnyWordSpec with Matchers {
 
 				tui.command("size").get shouldBe "Size: " + tui.width + " " + tui.height
 			}
-			"should not do anything on unknown command" in noc {
+			"should do nothing on unknown command" in noc {
 				val tui = new Tui(new Controller(Board(), RulesFake(), playerFactory = playerGenerator, fileIo = fileIo), width, height, scale, (0, 0))
 
 				val command = "unknownCoMmaNd"

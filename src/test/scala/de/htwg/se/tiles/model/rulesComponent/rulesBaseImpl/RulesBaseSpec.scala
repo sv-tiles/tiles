@@ -59,7 +59,7 @@ class RulesBaseSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
 			noException should be thrownBy rules.randomPlaceable(Board())
 			noException should be thrownBy rules.randomPlaceable(board)
 		}
-		"have equivalent no-prams constructors" in {
+		"have equivalent non-prams constructors" in {
 			RulesBase.apply().maxPeople shouldBe new RulesBase().maxPeople
 		}
 		"find islands" in {
@@ -90,7 +90,7 @@ class RulesBaseSpec extends AnyWordSpec with Matchers with PrivateMethodTester {
 					SubPosition(pos.south(), Direction.South)
 				), complete = false, valueOf(1, 3, rules), HashSet.empty)
 		}
-		"assignPoints" in {
+		"assign points" in {
 			val pos = Position(0, 0)
 			val board = Board(
 				players = Vector[PlayerBase]()

@@ -30,4 +30,4 @@ displayed. A solid line represents a closed area, a dashed line represents an ar
 End your turn by clicking `End turn` button, or use the middle mouse button on the placed tile. If an area was closed,
 the points will be distributed in the player overview.
 
-The next player can now start his turn and [place his tile](#place-tiles).
+The next player can now start their turn and [place their tile](#place-tiles).

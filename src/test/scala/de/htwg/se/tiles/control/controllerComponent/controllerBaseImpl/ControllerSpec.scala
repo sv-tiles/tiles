@@ -43,7 +43,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			controller.placeTile((1, 1))
 			controller.placeTile((1, 1))
 		}
-		"pick tile up" in {
+		"pick up tile" in {
 			val board2 = board.placeCurrentTile(Position(-9, -9)).get
 			val controller = new Controller(board2, RulesFake(), playerFactory = playerGenerator, fileIo = fileIo)
 			controller.pickUpTile()
@@ -222,7 +222,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 			lastError2._1 shouldBe false
 			lastError2._2 should (startWith("Error:"))
 		}
-		"fail on add player if player name already in use" in {
+		"fail on add player if player name is already in use" in {
 			val fIo = new FileIoError()
 			val controller = new Controller(Board(), RulesFake(), playerFactory = playerGenerator, fileIo = fIo)
 			val observer = new RecordingObserver()

@@ -112,6 +112,13 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 												"Forward Mouse Button: Rotate tile counterclockwise"
 											dialogPane.value.setMinWidth(600)
 										}.show()
+									},
+									new MenuItem("Points") {
+										onAction = _ => new Alert(AlertType.Information) {
+											initOwner(stage)
+											contentText = "1.2 per center region\n" +
+												"0.4 per border region"
+										}
 									}
 								)
 							}
@@ -158,7 +165,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 					anchor = Position2D(event.getSceneX, event.getSceneY)
 				}
 				onMouseDragged = event => if (event.isSecondaryButtonDown) {
-					offset += anchor - (event.getSceneX, event.getSceneY)
+					offset += Position2D((anchor.x - event.getSceneX) / size, (anchor.y - event.getSceneY) / size)
 					anchor = Position2D(event.getSceneX, event.getSceneY)
 					update()
 				}
@@ -178,10 +185,10 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 	}
 
 	def boardToLocal(pos: Position): Position2D =
-		Position2D(pos.x * size + pane.width.value / 2d - size / 2d, pos.y * size + pane.height.value / 2d - size / 2d) - offset
+		Position2D(pos.x * size + pane.width.value / 2d - size / 2d - offset.x * size, pos.y * size + pane.height.value / 2d - size / 2d - offset.y * size)
 
 	def localToBoard(pos: Position2D): (Int, Int) =
-		(((pos.x + offset.x + size / 2d - pane.width.value / 2d) / size).round.intValue, ((pos.y + offset.y + size / 2d - pane.height.value / 2d) / size).round.intValue)
+		(((pos.x + offset.x * size + size / 2d - pane.width.value / 2d) / size).round.intValue, ((pos.y + offset.y * size + size / 2d - pane.height.value / 2d) / size).round.intValue)
 
 	override def update(value: (Boolean, String) = (true, "")): Unit = {
 		players.children = controller.board.players.map[Node](p => new VBox() {
@@ -193,6 +200,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 				new Label(p.name),
 				new ColorPicker(p.color) {
 					style = "-fx-color-label-visible: false ;"
+					maxWidth = Double.MaxValue
 					onAction = _ => {
 						println(value.value)
 						controller.setPlayerColor(p, new Color(value.value))
