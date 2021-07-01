@@ -4,8 +4,27 @@
 	-fx-text-fill: white;
 }
 
-.dialog-pane {
+.dialog-pane,
+.scroll-pane,
+.scroll-bar:horizontal,
+.scroll-bar:vertical,
+.scroll-pane > .corner {
     -fx-background-color: rgb(100,100,100);
+}
+
+.increment-button,
+.decrement-button,
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: rgb(50,50,50);
+    -fx-background-radius: 5em;
 }
 
 .dialog-pane .label {

@@ -7,6 +7,7 @@ import de.htwg.se.tiles.util.{Observer, Position2D}
 import scalafx.application.{JFXApp3, Platform}
 import scalafx.geometry.Insets
 import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.control.ScrollPane.ScrollBarPolicy
 import scalafx.scene.control._
 import scalafx.scene.layout._
 import scalafx.scene.paint.Color
@@ -43,6 +44,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 
 	private val players = new VBox() {
 		prefWidth = 200
+		style = "-fx-background-color: rgb(100,100,100);"
 	}
 
 	private val info = new Text("") {
@@ -100,6 +102,8 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 								items = List(
 									new MenuItem("Controls") {
 										onAction = _ => new Alert(AlertType.Information) {
+											title = "Controls"
+											headerText = "Controls"
 											initOwner(stage)
 											contentText = "Everywhere:\n" +
 												"Mouse Wheel: Change zoom\n" +
@@ -115,10 +119,12 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 									},
 									new MenuItem("Points") {
 										onAction = _ => new Alert(AlertType.Information) {
+											title = "Points"
+											headerText = "Points"
 											initOwner(stage)
-											contentText = "1.2 per center region\n" +
-												"0.4 per border region"
-										}
+											contentText = "1.2 points per center region\n" +
+												"0.4 points per border region"
+										}.show()
 									}
 								)
 							}
@@ -147,7 +153,7 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 								onAction = _ => controller.rotate(true)
 							},
 							new Label("") {
-								margin = Insets.apply(10, 0, 0, 0)
+								margin = Insets.apply(20, 0, 0, 0)
 							},
 							new Button("End turn") {
 								maxWidth = Double.MaxValue
@@ -158,7 +164,13 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 							}
 						)
 					}
-					right = players
+					right = new ScrollPane() {
+						content = players
+						fitToHeight = true
+						fitToWidth = true
+						hbarPolicy = ScrollBarPolicy.Never
+						vbarPolicy = ScrollBarPolicy.AsNeeded
+					}
 				}
 				private var anchor = Position2D(0d, 0d)
 				onMousePressed = event => if (event.isSecondaryButtonDown) {
@@ -193,11 +205,11 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 	override def update(value: (Boolean, String) = (true, "")): Unit = {
 		players.children = controller.board.players.map[Node](p => new VBox() {
 			fillWidth = true
+			margin = Insets.apply(0d, 0d, 30d, 0d)
 			if (controller.board.getCurrentPlayer.get == p) {
 				border = new Border(new BorderStroke(Color.Red, BorderStrokeStyle.Solid, CornerRadii.Empty, BorderWidths.Default))
 			}
 			children = List(
-				new Label(p.name),
 				new ColorPicker(p.color) {
 					style = "-fx-color-label-visible: false ;"
 					maxWidth = Double.MaxValue
@@ -205,6 +217,12 @@ class Gui(val controller: ControllerInterface) extends JFXApp3 with Observer[(Bo
 						println(value.value)
 						controller.setPlayerColor(p, new Color(value.value))
 						update()
+					}
+				},
+				new Label(p.name) {
+					style = "-fx-font-size: 20pt;"
+					if (controller.board.getCurrentPlayer.get == p) {
+						style = style.value + "-fx-text-fill: red;"
 					}
 				},
 				new Label(p.points + " Points"),

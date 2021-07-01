@@ -19,7 +19,7 @@ case class Board(players: Vector[PlayerInterface] = Vector.empty, currentPlayer:
 	@Inject
 	def this() = this(currentPlayer = 0)
 
-	override def clear: BoardInterface = Board(players = players)
+	override def clear: BoardInterface = Board(players = players.map(p => p.setPeople(Vector.empty).setPoints(0)))
 
 	override def getTileBuilder: TileBuilderInterface = TileBuilder
 
